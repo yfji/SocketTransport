@@ -65,10 +65,10 @@ static void* client_read_data(void* args){
 }
 
 int solve_out(int argc, char** argv){
-	int port=8010;
-	int keypoint_port=8012;
+	int port=9010;
+	int keypoint_port=9012;
 	string inetAddr="10.106.20.8";
-	string serverAddr="10.106.20.8";
+	string serverAddr="47.93.229.233";
 	pthread_t id_client;
 	pthread_t id_client_data;
 	Client client(serverAddr, port);

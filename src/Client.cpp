@@ -1,13 +1,14 @@
 /*
  * Client.cpp
  *
- *  Created on: 2017�?4�?12�?
  *      Author: yufeng
  */
 
 #include "Client.h"
 #include <mutex>
 #include <memory>
+
+#define RESIZE	1
 
 bool bValidDataArrived;
 bool bNewDataArrived;
@@ -118,6 +119,9 @@ void Client::listenAndSendFrame(){
 				//if(not globalFrames[queueFrames].empty())
 				//	globalFrames[queueFrames].copyTo(globalFrame);
 				mVideoCap>>image;
+#if	RESIZE==1
+				cv::resize(image, image, cv::Size(image.cols/2, image.rows/2));
+#endif
 				image.copyTo(globalFrames[queueFrames]);
 				queueFrames=(queueFrames+1)%maxQueueLen;
 				dataMutex.unlock();
