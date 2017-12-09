@@ -41,6 +41,7 @@ Client::~Client() {
 }
 
 bool Client::connectServer(){
+	std::cout<<"connect"<<std::endl;
 	if(connect(clientsd, (struct sockaddr*)(&server_socket), sizeof(server_socket))<0){
 		printf("Connect error\n");
 		bConnected=false;
