@@ -1,0 +1,5 @@
+Debug/src/*.d
+Debug/src/*.o
+Debug/SocketTransport
+sample_images/*
+saved_images/*
