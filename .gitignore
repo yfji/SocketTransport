@@ -1,0 +1,8 @@
+Debug/src/*.d
+Debug/src/*.o
+Debug/SocketTransport
+Debug/SocketTransport_runnable
+sample_images/*
+saved_images/*
+src_backup/*
+*.mp4
