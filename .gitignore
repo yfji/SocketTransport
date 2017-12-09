@@ -1,0 +1,6 @@
+Debug/src/*.d 
+Debug/src/*.o
+Debug/*.mp4
+sample_images/*.*
+saved_images/*.*
+*.mp4
