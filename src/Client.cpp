@@ -42,7 +42,7 @@ bool Client::connectServer(){
 		return false;
 	}
 	bConnected=true;
-	cout<<"server connect successfully"<<endl;
+	// cout<<"server connect successfully"<<endl;
 	return true;
 }
 

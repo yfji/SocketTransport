@@ -261,43 +261,48 @@ void ServerReadData::receiveData(){
 			// obtain the keypoint of the first person from the keypoint string
     		spEstimator->readOpenposePeaks(buff);
     		std::string actPath = spDbManager->getTxtFromDatabase(act_id); 
-			// std::cout<<"actPath : "<<actPath<<std::endl;
+			std::cout<<"actPath : "<<actPath<<std::endl;
 			// obtain the standard keypoint peaks according to the act_id
-			
+			double poseScore=0;
+			std::string txtPathDatabase="";
 			if(actPath!=""){
 				spEstimator->readDatabasePeaks(actPath.c_str());	
 				/***calculate the score of each part***/
-				double poseScore =spEstimator->calcScoreBody();
+				poseScore =spEstimator->calcScoreBody();
 				poseScore=spEstimator->normalize(poseScore);
-				// std::cout<<"Score: "<<poseScore<<std::endl;
-				writeScore(poseScore);
+				std::cout<<"Score: "<<poseScore<<std::endl;
+				// writeScore(poseScore);
 
 				/**************** draw and save the dealt image ****************/
-				cv::Mat deal_img = globalFrames[frameIndex].clone();
-				sprintf(frameStr, "%d.jpg", (frameIndex+1));
+				
 #ifdef SAVE_TXT
 				sprintf(txtStr, "%d.txt", (frameIndex+1));
 #endif
-				std::string imgPathDatabase=imgDealPath+std::string(frameStr);
-				std::string imgPath =imgBasePath+imgPathDatabase;
+				
 #ifdef SAVE_TXT
-				std::string txtPathDatabase=txtDealPath+std::string(txtStr);
+				txtPathDatabase=txtDealPath+std::string(txtStr);
 				std::string txtPath=txtBasePath+txtPathDatabase;
 				// std::cout<<imgPath<<std::endl;
 				// std::cout<<txtPath<<std::endl;
 #endif
-				drawKeypoints(deal_img);
-				cv::imwrite(imgPath, deal_img);
-			
-				/****update image url, txt url and pose data****/
-				spDbManager->writeUrlToDatabase(imgPathDatabase, txtPathDatabase);
+				
 #ifdef SAVE_TXT	
 				saveTxtFile(txtPath.c_str());
 #endif
 				// std::cout<<"Write records successfully"<<std::endl;
 			
-				usleep(5);
+				
 			}
+			cv::Mat deal_img = globalFrames[frameIndex].clone();
+			sprintf(frameStr, "%d.jpg", (frameIndex+1));
+			std::string imgPathDatabase=imgDealPath+std::string(frameStr);
+			std::string imgPath =imgBasePath+imgPathDatabase;
+			drawKeypoints(deal_img);
+			cv::imwrite(imgPath, deal_img);
+			/****update image url, txt url and pose data****/
+			spDbManager->writeScoreToDatabase(poseScore);
+			spDbManager->writeUrlToDatabase(imgPathDatabase, txtPathDatabase);
+			usleep(5);
 		}
 		frameIndex=(frameIndex+1)%maxQueueLen;
 		sendMessage("data");
