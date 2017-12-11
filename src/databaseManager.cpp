@@ -63,9 +63,7 @@ bool DatabaseManager::queryImage(int uid, int act_id){
     int rowcount = mysql_num_rows(result);
     if(rowcount==0){
         std::cout<<"No item selected, please check!"<<std::endl;
-        imagesOneQuery.push_back(cv::Mat());
-        imageIds.push_back(-1);
-        return true;
+        return false;
     }
     std::cout<<rowcount<<" images selected"<<std::endl;
     if(recordCount!=0 and recordCount!=rowcount){
@@ -96,17 +94,15 @@ bool DatabaseManager::queryTxt(int act_id){
     int rowcount = mysql_num_rows(result);
     if(rowcount==0){
         std::cout<<"No item selected, please check!"<<std::endl;
-        txtIds.push_back(-1);
-        txtsOneQuery.push_back(NULL);
-        return true;
+        return false;
     }
     std::cout<<rowcount<<" txts selected"<<std::endl;
     if(recordCount!=0 and recordCount!=rowcount){
-    	std::cout<<"Numbers of standard image and txt are not the same, please check!"<<std::endl;
+    	std::cout<<"Numbers of txt and standard image are not the same, please check!"<<std::endl;
         return false;
     }
     recordCount=rowcount;
-    for(int i=0;i<txtCount;++i)
+    for(int i=0;i<recordCount;++i)
     {
         MYSQL_ROW row = mysql_fetch_row(result);
         std::string txtPath=txtBasePath+row[1];
@@ -114,6 +110,7 @@ bool DatabaseManager::queryTxt(int act_id){
         txtIds.push_back(txtId);
         txtsOneQuery.push_back(txtPath);
     }
+    return true;
 }
 
 bool DatabaseManager::queryBeforeGet(int uid, int act_id){
@@ -148,7 +145,7 @@ std::string DatabaseManager::getTxtFromDatabase(int act_id){
     //else if(txtIndex==txtCount && txtsOneQuery.size()>0){
     //    return NULL;
     //}
-	return NULL;
+	return "";
 }
 
 bool DatabaseManager::writeScoreToDatabase(const double score){

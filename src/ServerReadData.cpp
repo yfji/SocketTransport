@@ -237,7 +237,7 @@ void ServerReadData::receiveData(){
 	bool queryOK=spDbManager->queryTxt(act_id);
 	
 	if(not queryOK){
-		std::cout<<"No valid txt files found in database, exit!"<<std::endl;
+		std::cout<<"TXT files and image files not corresponding, exit!"<<std::endl;
 		return;
 	}
 	while(1)
@@ -277,6 +277,7 @@ void ServerReadData::receiveData(){
     		spEstimator->readOpenposePeaks(buff);
     		
     		std::string poseData="";
+    		std::cout<<"here 2"<<std::endl;
     		readPoseData(poseData);
     		std::cout<<poseData<<std::endl;
     		
@@ -290,7 +291,7 @@ void ServerReadData::receiveData(){
 				std::cout<<"actPath : "<<actPath<<std::endl;
 				spEstimator->readDatabasePeaks(actPath.c_str());	
 				/***calculate the score of each part***/
-				double poseScore =spEstimator->calcScoreBody();
+				poseScore =spEstimator->calcScoreBody();
 				poseScore=spEstimator->normalize(poseScore);
 				std::cout<<"Score: "<<poseScore<<std::endl;
 #ifdef SAVE_TXT

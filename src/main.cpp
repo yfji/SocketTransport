@@ -44,8 +44,8 @@ int solve_out(int argc, char** argv){
 		std::cout<<"you must provide the uid and act_id, please check!"<<std::endl;
 		return -1;	//err code
 	}
-	int port=8010;
-	int keypoint_port=8012;
+	int port=8910;
+	int keypoint_port=8912;
 	int uid=std::atoi(argv[1]);
 	int act_id=std::atoi(argv[2]);
 	pthread_t id_client;

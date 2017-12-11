@@ -95,6 +95,7 @@ void Client::listenAndSendFrame(){
 	while(1){
 		if(strcmp(message, "frame")==0){
 			if(not queryOK){
+				std::cout<<"TXT files and image files not corresponding, exit!"<<std::endl;
 				sendMessage("stop");
 			}
 #ifdef FINITE_FRAMES
