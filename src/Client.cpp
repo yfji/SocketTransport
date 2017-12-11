@@ -86,10 +86,10 @@ void Client::listenAndSendFrame(){
 
 	cv::Mat image;
 	// const int numGpu=7;
-	const int queueLen=10;
+	maxQueueLen=10;
 	int queueFrames=0;
 	// int gpuFrames=0;
-	globalFrames.resize(queueLen);
+	globalFrames.resize(maxQueueLen);
 	
 	bool queryOK=spDbManager->queryImage(uid, act_id);
 	while(1){
@@ -111,7 +111,7 @@ void Client::listenAndSendFrame(){
 				}
 				else{
 					image.copyTo(globalFrames[queueFrames]);
-					queueFrames=(queueFrames+1)%queueLen;
+					queueFrames=(queueFrames+1)%maxQueueLen;
 					char header[50];
 					vector<uchar> mat_data;
 					cv::imencode(".jpg", image, mat_data);

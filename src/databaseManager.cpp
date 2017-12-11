@@ -51,12 +51,13 @@ DatabaseManager& DatabaseManager::operator=(const DatabaseManager& dbManager){
 }
 
 bool DatabaseManager::queryImage(int uid, int act_id){
+	const std::lock_guard<std::mutex> lock{databaseMutex};
 	std::stringstream image_cmd;
 	image_cmd<<"select id,img_url from "<<tableNames[0]<<" where uid = '"<<uid<<"' and action_id = '"<<act_id<<"'";
 	int res = mysql_query(&conn, image_cmd.str().c_str());
 	if(res){
 		release();
-		std::cout<<"Query database error!"<<std::endl;
+		std::cout<<"Query database for image error!"<<std::endl;
 		return false;
 	}
     result = mysql_store_result(&conn);
@@ -65,7 +66,6 @@ bool DatabaseManager::queryImage(int uid, int act_id){
         std::cout<<"No item selected, please check!"<<std::endl;
         return false;
     }
-    std::cout<<rowcount<<" images selected"<<std::endl;
     if(recordCount!=0 and recordCount!=rowcount){
     	std::cout<<"Numbers of standard image and txt are not the same, please check!"<<std::endl;
         return false;
@@ -78,16 +78,18 @@ bool DatabaseManager::queryImage(int uid, int act_id){
         imageIds.push_back(imgId);
         imagesOneQuery.push_back(cv::imread(name));
     }
+    std::cout<<imagesOneQuery.size()<<" images selected"<<std::endl;
     return true;
 }
 
 bool DatabaseManager::queryTxt(int act_id){
+	const std::lock_guard<std::mutex> lock{databaseMutex};
 	std::stringstream txt_cmd;
 	txt_cmd<<"select id,action_txt from "<<tableNames[1]<<" where action_id = '"<<act_id<<"'";
 	int res = mysql_query(&conn, txt_cmd.str().c_str());
 	if(res){
 		release();
-		std::cout<<"Query database error!"<<std::endl;
+		std::cout<<"Query database for txt error!"<<std::endl;
 		return false;
 	}
     result = mysql_store_result(&conn);
@@ -96,7 +98,6 @@ bool DatabaseManager::queryTxt(int act_id){
         std::cout<<"No item selected, please check!"<<std::endl;
         return false;
     }
-    std::cout<<rowcount<<" txts selected"<<std::endl;
     if(recordCount!=0 and recordCount!=rowcount){
     	std::cout<<"Numbers of txt and standard image are not the same, please check!"<<std::endl;
         return false;
@@ -110,6 +111,7 @@ bool DatabaseManager::queryTxt(int act_id){
         txtIds.push_back(txtId);
         txtsOneQuery.push_back(txtPath);
     }
+    std::cout<<txtsOneQuery.size()<<" txts selected"<<std::endl;
     return true;
 }
 
@@ -122,7 +124,6 @@ bool DatabaseManager::queryBeforeGet(int uid, int act_id){
 
 cv::Mat DatabaseManager::getImageFromDatabase(int uid, int act_id){
     //std::cout<<"get frame"<<std::endl;
-    const std::lock_guard<std::mutex> lock{databaseMutex};
     if(frameIndex<recordCount and imagesOneQuery.size()>0){
         cv::Mat curImage=imagesOneQuery[frameIndex];
         ++frameIndex;
@@ -136,7 +137,6 @@ cv::Mat DatabaseManager::getImageFromDatabase(int uid, int act_id){
 
 std::string DatabaseManager::getTxtFromDatabase(int act_id){
     //std::cout<<"get frame"<<std::endl;
-    const std::lock_guard<std::mutex> lock{databaseMutex};
     if(txtIndex<recordCount and txtsOneQuery.size()>0){
         std::string curTxt=txtsOneQuery[txtIndex];
         ++txtIndex;
@@ -165,7 +165,7 @@ bool DatabaseManager::writeScoreToDatabase(const double score){
 bool DatabaseManager::writeImageUrlToDatabase(const std::string& imgurl){
     const std::lock_guard<std::mutex> lock{databaseMutex};
     std::stringstream cmd;
-    cmd<<"update "<<tableNames[0]<<" set img_deal = '"<<imgurl<<"' where id = '"<<imageIds[recordCount]<<"'";
+    cmd<<"update "<<tableNames[0]<<" set img_deal = '"<<imgurl<<"' where id = '"<<imageIds[recordWriteCount]<<"'";
     int res = mysql_query(&conn, cmd.str().c_str());
 	if(res){
 		release();
@@ -179,7 +179,7 @@ bool DatabaseManager::writeImageUrlToDatabase(const std::string& imgurl){
 bool DatabaseManager::writeTxtUrlToDatabase(const std::string& txtUrl){
 	const std::lock_guard<std::mutex> lock{databaseMutex};
     std::stringstream cmd;
-    cmd<<"update "<<tableNames[0]<<" set deal_txt = '"<<txtUrl<<"' where id = '"<<imageIds[recordCount]<<"'";
+    cmd<<"update "<<tableNames[0]<<" set deal_txt = '"<<txtUrl<<"' where id = '"<<imageIds[recordWriteCount]<<"'";
     int res = mysql_query(&conn, cmd.str().c_str());
 	if(res){
 		release();
@@ -193,7 +193,7 @@ bool DatabaseManager::writeTxtUrlToDatabase(const std::string& txtUrl){
 bool DatabaseManager::writePoseDataToDatabase(const std::string& data){
 	const std::lock_guard<std::mutex> lock{databaseMutex};
 	std::stringstream cmd;
-    cmd<<"update "<<tableNames[0]<<" set action_content = '"<<data<<"' where id = '"<<imageIds[recordCount]<<"'";
+    cmd<<"update "<<tableNames[0]<<" set action_content = '"<<data<<"' where id = '"<<imageIds[recordWriteCount]<<"'";
     int res = mysql_query(&conn, cmd.str().c_str());
 	if(res){
 		release();
@@ -213,5 +213,5 @@ void DatabaseManager::clear(){
 }
 
 void DatabaseManager::writeCountPP(){
-	recordCount++;
+	recordWriteCount++;
 }

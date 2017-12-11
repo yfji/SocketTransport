@@ -254,10 +254,12 @@ void ServerReadData::receiveData(){
 		else if(strcmp(buff, "stop")==0){
 			break;
 		}
+		
 		else if(strcmp(buff, "nop")==0){
 			cout<<"nop"<<endl;
 		//	continue;
 		}
+		
 		else{
 			// cout<<"person pose information:\n";
 			// print
@@ -277,9 +279,8 @@ void ServerReadData::receiveData(){
     		spEstimator->readOpenposePeaks(buff);
     		
     		std::string poseData="";
-    		std::cout<<"here 2"<<std::endl;
     		readPoseData(poseData);
-    		std::cout<<poseData<<std::endl;
+    		// std::cout<<poseData<<std::endl;
     		
     		std::string actPath = spDbManager->getTxtFromDatabase(act_id); 
     		
@@ -319,12 +320,15 @@ void ServerReadData::receiveData(){
 			spDbManager->writeTxtUrlToDatabase(txtPathDatabase);
 			spDbManager->writePoseDataToDatabase(poseData);
 			
-			std::cout<<"Write records successfully: "<<imgPathDatabase<<std::endl;
+			std::cout<<"Write records successfully"<<std::endl;
+			
+			spDbManager->writeCountPP();
 		}
 		frameIndex=(frameIndex+1)%maxQueueLen;
 		sendMessage("data");
 		usleep(5);
 	}
+	spDbManager->clear();
 	bConnected=false;
 }
 
