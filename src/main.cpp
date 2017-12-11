@@ -15,15 +15,14 @@ static std::shared_ptr<Estimator> spEstimator;
 
 static void* client_thread(void* args){
 	Client* pClient=(Client*)args;
-	pClient->queryDatabase();
 	if(pClient->connectServer()){
 		cout<<"listening for frame request"<<endl;
 		pClient->listenAndSendFrame();
-		cout<<"Send frames finished"<<endl;
 	}
 	else{
 		return NULL;
 	}
+	cout<<"Send frames finished"<<endl;
 }
 
 static void* server_read_data(void* args){

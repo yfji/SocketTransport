@@ -82,10 +82,8 @@ void Client::listenAndSendFrame(){
 	char message[50];
 	char poseInfo[4096];
 	strcpy(message, "");
-	//cv::namedWindow("client");
 
 	cv::Mat image;
-	// const int numGpu=7;
 	maxQueueLen=10;
 	int queueFrames=0;
 	// int gpuFrames=0;
@@ -93,6 +91,11 @@ void Client::listenAndSendFrame(){
 	
 	bool queryOK=spDbManager->queryImage(uid, act_id);
 	while(1){
+		memset(message, '\0', sizeof(message));
+		int rn=recv(clientsd, message, sizeof(message), 0);
+		message[rn]='\0';
+		//if(strlen(message)>0)	cout<<message<<endl;
+		
 		if(strcmp(message, "frame")==0){
 			if(not queryOK){
 				std::cout<<"TXT files and image files not corresponding, exit!"<<std::endl;
@@ -104,7 +107,6 @@ void Client::listenAndSendFrame(){
 			}
 			else{
 #endif
-				
 				image=spDbManager->getImageFromDatabase(uid, act_id);
 				if(image.empty()){
 					sendMessage("stop");
@@ -139,9 +141,6 @@ void Client::listenAndSendFrame(){
 			break;
 		}
 		usleep(5);
-		int rn=recv(clientsd, message, sizeof(message), 0);
-		message[rn]='\0';
-		//if(strlen(message)>0)	cout<<message<<endl;
 	}
 	bConnected=false;
 	close(clientsd);

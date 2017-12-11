@@ -234,6 +234,7 @@ void ServerReadData::receiveData(){
 	std::cout<<"ImgUrl: "<<imgDealPath<<std::endl;
 	std::cout<<"txtUrl: "<<txtDealPath<<std::endl;
 	
+	bool hasPerson=true;
 	bool queryOK=spDbManager->queryTxt(act_id);
 	
 	if(not queryOK){
@@ -255,8 +256,16 @@ void ServerReadData::receiveData(){
 			break;
 		}
 		
-		else if(strcmp(buff, "nop")==0){
+		double poseScore=0;
+		std::string imgPathDatabase="";
+		std::string txtPathDatabase="";
+		std::string poseData="";
+		
+		hasPerson=true;
+		/***no person in image***/
+		if(strcmp(buff, "nop")==0){
 			cout<<"nop"<<endl;
+			hasPerson=false;
 		//	continue;
 		}
 		
@@ -278,16 +287,11 @@ void ServerReadData::receiveData(){
 			
     		spEstimator->readOpenposePeaks(buff);
     		
-    		std::string poseData="";
     		readPoseData(poseData);
     		// std::cout<<poseData<<std::endl;
-    		
     		std::string actPath = spDbManager->getTxtFromDatabase(act_id); 
     		
     		/***obtain the standard keypoint peaks according to the act_id***/
-    		double poseScore=0;
-			std::string txtPathDatabase="";
-			
 			if(actPath!=""){
 				std::cout<<"actPath : "<<actPath<<std::endl;
 				spEstimator->readDatabasePeaks(actPath.c_str());	
@@ -297,33 +301,34 @@ void ServerReadData::receiveData(){
 				std::cout<<"Score: "<<poseScore<<std::endl;
 #ifdef SAVE_TXT
 				sprintf(txtStr, "%d.txt", (frameIndex+1));
-				std::string txtPathDatabase=txtDealPath+std::string(txtStr);
+				txtPathDatabase=txtDealPath+std::string(txtStr);
 				std::string txtPath=txtBasePath+txtPathDatabase;
-				// std::cout<<imgPath<<std::endl;
-				// std::cout<<txtPath<<std::endl;
 				saveTxtFile(txtPath.c_str(), poseData);
 #endif
 			}
-			/****update scores****/
-			spDbManager->writeScoreToDatabase(poseScore);
-			
-			/**************** draw and save the dealt image ****************/
-			cv::Mat deal_img = globalFrames[frameIndex].clone();
-			sprintf(frameStr, "%d.jpg", (frameIndex+1));
-			std::string imgPathDatabase=imgDealPath+std::string(frameStr);
-			std::string imgPath =imgBasePath+imgPathDatabase;
-			drawKeypoints(deal_img);
-			cv::imwrite(imgPath, deal_img);
-			
-			/****update image url, txt url and pose data****/
-			spDbManager->writeImageUrlToDatabase(imgPathDatabase);
-			spDbManager->writeTxtUrlToDatabase(txtPathDatabase);
-			spDbManager->writePoseDataToDatabase(poseData);
-			
-			std::cout<<"Write records successfully"<<std::endl;
-			
-			spDbManager->writeCountPP();
 		}
+		/****update scores****/
+		spDbManager->writeScoreToDatabase(poseScore);
+		
+		/**************** draw and save the dealt image ****************/
+		cv::Mat deal_img = globalFrames[frameIndex].clone();
+		sprintf(frameStr, "%d.jpg", (frameIndex+1));
+		imgPathDatabase=imgDealPath+std::string(frameStr);
+		std::string imgPath =imgBasePath+imgPathDatabase;
+		
+		if(hasPerson)
+			drawKeypoints(deal_img);
+		cv::imwrite(imgPath, deal_img);
+		
+		/****update image url, txt url and pose data****/
+		spDbManager->writeImageUrlToDatabase(imgPathDatabase);
+		spDbManager->writeTxtUrlToDatabase(txtPathDatabase);
+		spDbManager->writePoseDataToDatabase(poseData);
+		
+		std::cout<<"Write records successfully"<<std::endl;
+		
+		spDbManager->writeCountPP();
+		
 		frameIndex=(frameIndex+1)%maxQueueLen;
 		sendMessage("data");
 		usleep(5);
