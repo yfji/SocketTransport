@@ -241,6 +241,7 @@ void ServerReadData::receiveData(){
 			std::string imgPathDatabase=imgDealPath+std::string(frameStr);
 			std::string imgPath=imgBasePath+imgPathDatabase;
 			cv::imwrite(imgPath, deal_img);
+			spDbManager->writeScoreToDatabase(0);
 			spDbManager->writeUrlToDatabase(imgPathDatabase, "");
 			// continue;
 		}
@@ -277,21 +278,11 @@ void ServerReadData::receiveData(){
 				
 #ifdef SAVE_TXT
 				sprintf(txtStr, "%d.txt", (frameIndex+1));
-#endif
-				
-#ifdef SAVE_TXT
 				txtPathDatabase=txtDealPath+std::string(txtStr);
 				std::string txtPath=txtBasePath+txtPathDatabase;
-				// std::cout<<imgPath<<std::endl;
-				// std::cout<<txtPath<<std::endl;
-#endif
-				
-#ifdef SAVE_TXT	
 				saveTxtFile(txtPath.c_str());
 #endif
 				// std::cout<<"Write records successfully"<<std::endl;
-			
-				
 			}
 			cv::Mat deal_img = globalFrames[frameIndex].clone();
 			sprintf(frameStr, "%d.jpg", (frameIndex+1));
@@ -302,10 +293,10 @@ void ServerReadData::receiveData(){
 			/****update image url, txt url and pose data****/
 			spDbManager->writeScoreToDatabase(poseScore);
 			spDbManager->writeUrlToDatabase(imgPathDatabase, txtPathDatabase);
-			usleep(5);
 		}
 		frameIndex=(frameIndex+1)%maxQueueLen;
 		sendMessage("data");
+		usleep(5);
 	}
 	bConnected=false;
 }

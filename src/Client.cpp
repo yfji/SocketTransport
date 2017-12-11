@@ -91,6 +91,10 @@ void Client::listenAndSendFrame(){
 	// int gpuFrames=0;
 	globalFrames.resize(maxQueueLen);
 	while(1){
+		memset(message, '\0', sizeof(message));
+		int rn=recv(clientsd, message, sizeof(message), 0);
+		message[rn]='\0';
+		// if(strlen(message)>0)	cout<<message<<endl;
 		if(strcmp(message, "frame")==0){
 #ifdef FINITE_FRAMES
 			if(frameIndex==500){
@@ -133,9 +137,6 @@ void Client::listenAndSendFrame(){
 			break;
 		}
 		usleep(5);
-		int rn=recv(clientsd, message, sizeof(message), 0);
-		message[rn]='\0';
-		// if(strlen(message)>0)	cout<<message<<endl;
 	}
 	bConnected=false;
 	close(clientsd);
