@@ -1,3 +1,4 @@
 build/src/*.d
 build/src/*.o
 SocketTransport
+*~
