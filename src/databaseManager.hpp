@@ -16,7 +16,7 @@ public:
     DatabaseManager(const DatabaseManager& dbManager);
     explicit DatabaseManager(const std::string& ip="localhost", \
                              const std::string& user="root", \
-                             const std::string& password="root");
+                             const std::string& password="yg123456yg");
   	virtual ~DatabaseManager();
 public:
 	inline bool isOpened() const{
