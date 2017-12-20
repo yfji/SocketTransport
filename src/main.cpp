@@ -65,15 +65,15 @@ static void* client_read_data(void* args){
 }
 
 int solve_out(int argc, char** argv){
-#define ALI	1
+#define ALI	0
 #if ALI==1
 	int port=8910;
 	int keypoint_port=8912;
 	string inetAddr="10.106.20.8";
 	string serverAddr="47.93.229.233";
 #else
-	int port=8010;
-	int keypoint_port=8012;
+	int port=8910;
+	int keypoint_port=8912;
 	string inetAddr="10.106.20.8";
 	string serverAddr="10.106.20.8";
 #endif
