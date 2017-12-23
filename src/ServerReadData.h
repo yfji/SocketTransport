@@ -37,7 +37,7 @@ private:
 	const int queue=10;
 	struct sockaddr_in server_socket;
 	struct sockaddr_in client_socket;
-	char buff[1000];
+	char buff[8000];
 	bool bConnected;
 	int frameIndex;
 	int numEmptyData;
