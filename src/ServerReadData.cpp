@@ -183,7 +183,6 @@ void ServerReadData::saveTxtFile(const char* fileName){
 			else if(i>=7 and i<=12)
 				color=(int)states[i-3];
 			out<<p1.x<<' '<<p1.y<<' '<<p2.x<<' '<<p2.y<<' '<<color;
-			
 		}
 		else{
 			out<<0<<' '<<0<<' '<<0<<' '<<0<<' '<<0;
