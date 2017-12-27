@@ -8,7 +8,7 @@
 #include <mutex>
 #include <memory>
 
-#define RESIZE	1
+#define RESIZE	0
 #define FINITE_FRAMES 	1
 #define COMPRESS	1
 #define SIMPLE	1

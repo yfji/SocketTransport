@@ -115,6 +115,8 @@ void ClientReadData::drawKeypoints(cv::Mat& frame){
 		if(x!=0 or y!=0){
 			cv::circle(frame, cv::Point2f(x,y), 3, colors[0], -1);
 		}
+		else
+			std::cout<<"keypoint "<<i<<" not visible"<<std::endl;
 	}
 }
 

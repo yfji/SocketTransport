@@ -33,7 +33,7 @@ private:
 	int clientsd;
 	int port;
 	const int queue=10;
-	char buff[4096];
+	char buff[8000];
 	char handcheckBuff[5];
 	const int cmd_len=4;
 	const char* handcheckMessage="yuge";

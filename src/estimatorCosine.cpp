@@ -75,7 +75,8 @@ double EstimatorCosine::calcScoreLimb(std::vector<int>& keypointIds, int limbInd
 			cosineScore+=1;
 		}
 		else{
-			// FILL_ARRAY(limbCorrect, limbIndex, i, 0)
+			FILL_ARRAY(limbCorrect, limbIndex, i, 0)
+			
 			// if(limbIndex<2){
 			// 	limbCorrect[limbIndex*3+i-1]=0;
 			// }
