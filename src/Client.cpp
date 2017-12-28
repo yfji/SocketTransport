@@ -11,7 +11,7 @@
 #define RESIZE	1
 #define FINITE_FRAMES 	1
 #define COMPRESS	1
-#define SIMPLE	0
+#define SIMPLE	1
 
 vector<cv::Mat> globalFrames;
 std::mutex dataMutex;
@@ -110,7 +110,6 @@ void Client::listenAndSendFrame(){
 
 			else{
 #endif
-				dataMutex.lock();
 				image=spDbManager->getImageFromDatabase();
 				if(image.empty()){
 					sendMessage("stop");
@@ -121,7 +120,6 @@ void Client::listenAndSendFrame(){
 #endif
 					image.copyTo(globalFrames[queueFrames]);
 					queueFrames=(queueFrames+1)%maxQueueLen;
-					dataMutex.unlock();
 					char header[50];
 #if COMPRESS==1
 					vector<uchar> mat_data;

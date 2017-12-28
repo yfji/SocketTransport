@@ -28,8 +28,7 @@ ClientReadData::ClientReadData(const string& ip, const int p, int _uid, int _act
 }
 
 ClientReadData::~ClientReadData() {
-	if(bConnected)
-		close(clientsd);
+	close(clientsd);
 }
 
 void ClientReadData::reset(const string& ip, const int p){
@@ -202,6 +201,7 @@ void ClientReadData::receiveData(){
 	
 	if(not queryOK){
 		std::cout<<"TXT files and image files not corresponding, exit!"<<std::endl;
+		sendMessage("data");
 		return;
 	}
 	while(1){
@@ -278,6 +278,5 @@ void ClientReadData::receiveData(){
 	}
 	spDbManager->clear();
 	bConnected=false;
-	close(clientsd);
 }
 
