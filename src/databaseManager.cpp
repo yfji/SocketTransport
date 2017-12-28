@@ -53,7 +53,7 @@ DatabaseManager& DatabaseManager::operator=(const DatabaseManager& dbManager){
 bool DatabaseManager::queryImage(int uid, int act_id){
 	const std::lock_guard<std::mutex> lock{databaseMutex};
 	std::stringstream image_cmd;
-	image_cmd<<"select id,img_url from "<<tableNames[0]<<" where uid = '"<<uid<<"' and act_id = '"<<act_id<<"'";
+	image_cmd<<"select id,img_url from "<<tableNames[0]<<" where uid = '"<<uid<<"' and action_id = '"<<act_id<<"'";
 	int res = mysql_query(&conn, image_cmd.str().c_str());
 	if(res){
 		release();
@@ -85,7 +85,7 @@ bool DatabaseManager::queryImage(int uid, int act_id){
 bool DatabaseManager::queryTxt(int act_id){
 	const std::lock_guard<std::mutex> lock{databaseMutex};
 	std::stringstream txt_cmd;
-	txt_cmd<<"select id,action_txt from "<<tableNames[1]<<" where act_id = '"<<act_id<<"'";
+	txt_cmd<<"select id,action_txt from "<<tableNames[1]<<" where action_id = '"<<act_id<<"'";
 	int res = mysql_query(&conn, txt_cmd.str().c_str());
 	if(res){
 		release();

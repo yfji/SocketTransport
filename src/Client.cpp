@@ -111,7 +111,9 @@ void Client::listenAndSendFrame(){
 			else{
 #endif
 				image=spDbManager->getImageFromDatabase();
+				dataMutex.unlock();
 				if(image.empty()){
+					std::cout<<"Empty image"<<std::endl;
 					sendMessage("stop");
 				}
 				else{

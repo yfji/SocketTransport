@@ -8,7 +8,7 @@
 #include <thread>
 #include <chrono>
 
-static const std::string databaseName="yg_sql";
+static const std::string databaseName="project";
 static const std::vector<std::string> tableNames={"yg_user_images", "yg_action"};
 static std::shared_ptr<DatabaseManager> spDbManager;
 static std::shared_ptr<Estimator> spEstimator;
@@ -56,8 +56,8 @@ int solve_out(int argc, char** argv){
 #else
 	int port=8910;
 	int keypoint_port=8912;
-	const std::string inetAddr="10.106.20.8";
-	const std::string serverAddr="10.106.20.8";
+	const std::string inetAddr="172.17.108.58";
+	const std::string serverAddr="172.17.108.58";
 #endif
 	Client client(serverAddr, port, uid, action_id);
 	ClientReadData dataReader(serverAddr, keypoint_port,uid, action_id);
