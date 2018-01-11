@@ -54,8 +54,8 @@ int solve_out(int argc, char** argv){
 	const std::string inetAddr="10.106.20.8";
 	const std::string serverAddr="47.93.229.233";
 #else
-	int port=8910;
-	int keypoint_port=8912;
+	int port=9110;
+	int keypoint_port=9112;
 	const std::string inetAddr="172.17.108.58";
 	const std::string serverAddr="172.17.108.58";
 #endif
