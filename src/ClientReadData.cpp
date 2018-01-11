@@ -6,6 +6,7 @@
  */
 
 #include "ClientReadData.h"
+#include <chrono>
 #include <mutex>
 
 extern vector<cv::Mat> globalFrames;
@@ -72,6 +73,9 @@ void ClientReadData::drawKeypoints(cv::Mat& frame){
 }
 
 void ClientReadData::receiveData(){
+	auto start=std::chrono::high_resolution_clock::now();
+	int frameCount=0;
+	double fps=0;
 	while(1){
 		memset(buff, '\0', sizeof(buff));
 		int rn=recv(clientsd, buff, sizeof(buff), 0);
@@ -93,13 +97,18 @@ void ClientReadData::receiveData(){
 				sendMessage("data");
 				continue;
 			}
+			dataMutex.lock();
 			globalFrames[frameIndex].copyTo(canvas);
-			
 			dataMutex.unlock();
 			drawKeypoints(canvas);
-			cv::imshow("frame", canvas);
-			cv::waitKey(1);
-			cout<<"data recved"<<endl;
+			// cv::imshow("frame", canvas); cv::waitKey(1);
+			auto now=std::chrono::high_resolution_clock::now();
+			double duration_ns=(double)std::chrono::duration_cast<std::chrono::nanoseconds>\
+				(now-start).count();
+			double seconds=duration_ns/1e9;
+			fps=(++frameCount)/seconds;
+			cout<<"fps: "<<fps<<endl;
+			// cout<<"data recved"<<endl;
 		}
 		frameIndex=(frameIndex+1)%maxQueueLen;
 		sendMessage("data");
