@@ -12,6 +12,8 @@ DatabaseManager::DatabaseManager(const DatabaseManager& dbManager){
     serverAddress=dbManager.serverAddress;
     userName=dbManager.userName;
     password=dbManager.password;
+    imageBasePath=dbManager.imageBasePath;
+	  txtBasePath=dbManager.txtBasePath;
 }
 DatabaseManager::DatabaseManager(const std::string& ip, \
                                            const std::string& user, \
@@ -27,6 +29,8 @@ DatabaseManager::DatabaseManager(const std::string& ip, \
 	serverAddress=ip;
 	userName=user;
 	password=passwd;
+	imageBasePath="/var/www/yuge/public";
+	txtBasePath="/var/www/yuge/public/";
 }
 
 DatabaseManager::~DatabaseManager(){
@@ -41,9 +45,11 @@ DatabaseManager& DatabaseManager::operator=(const DatabaseManager& dbManager){
     scoreCount=dbManager.scoreCount;
     txtIndex=dbManager.txtIndex;
     txtCount=dbManager.txtCount;
-	serverAddress=dbManager.serverAddress;
-	userName=dbManager.userName;
-	password=dbManager.password;
+		serverAddress=dbManager.serverAddress;
+		userName=dbManager.userName;
+		password=dbManager.password;
+		imageBasePath=dbManager.imageBasePath;
+		txtBasePath=dbManager.txtBasePath;
     return *this;
 }
 
@@ -107,7 +113,7 @@ std::string DatabaseManager::getTxtFromDatabase(int action_id, int act_id){
     result = mysql_store_result(&conn);
     int rowcount = mysql_num_rows(result);
     if(rowcount==0){
-        std::cout<<"No item selected, please check!"<<std::endl;
+        // std::cout<<"No item selected, please check!"<<std::endl;
         return "";
     }
     txtCount=rowcount;
@@ -115,6 +121,7 @@ std::string DatabaseManager::getTxtFromDatabase(int action_id, int act_id){
     {
         MYSQL_ROW row = mysql_fetch_row(result);
         std::string txtPath=txtBasePath+row[1];
+	// std::cout<<txtPath<<std::endl;
         int txtId=std::atoi(row[0]);
         txtIds.push_back(txtId);
         txtsOneQuery.push_back(txtPath);

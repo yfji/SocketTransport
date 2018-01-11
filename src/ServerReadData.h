@@ -45,6 +45,8 @@ private:
 	int uid;
 	int action_id;
 	int act_id;
+	double xScale;
+	double yScale;
 	cv::Mat canvas;
 
 	std::shared_ptr<DatabaseManager> spDbManager;

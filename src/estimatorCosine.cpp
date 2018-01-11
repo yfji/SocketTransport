@@ -62,6 +62,7 @@ double EstimatorCosine::calcScoreLimb(std::vector<int>& keypointIds, int limbInd
 			// std::cout<<keypointIds[i]<<":"<<"("<<delta_stdx<<","<<delta_stdy<<")"<<",("<<delta_refx<<","<<delta_refy<<"): "<<limbScore<<std::endl;
 			if(ang>angleHighest){
 				FILL_ARRAY(limbCorrect, limbIndex, i, 0)
+//std::cout<<"Wrong"<<std::endl;
 				// if(limbIndex<2){
 				// 	limbCorrect[limbIndex*3+i-1]=0;
 				// }
@@ -72,10 +73,12 @@ double EstimatorCosine::calcScoreLimb(std::vector<int>& keypointIds, int limbInd
 			cosineScore+=limbScore;		
 		}
 		else if(not stdVisible and not refVisible){
+//std::cout<<"Both unvisible"<<std::endl;
 			cosineScore+=1;
 		}
 		else{
-			// FILL_ARRAY(limbCorrect, limbIndex, i, 0)
+//std::cout<<"Not correspond"<<std::endl;
+			FILL_ARRAY(limbCorrect, limbIndex, i, 0)
 			// if(limbIndex<2){
 			// 	limbCorrect[limbIndex*3+i-1]=0;
 			// }

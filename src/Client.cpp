@@ -96,11 +96,19 @@ void Client::listenAndSendFrame(){
 			else{
 #endif
 				char header[50];
+                                vector<uchar> mat_data;
 				// image=spDbManager->getImageFromDatabase(uid, act_id);
-				std::string getImgBase64 = spRedis->get("imgBase64");
-    			std::string deImgBase64 = base64.Decode(getImgBase64.c_str(), getImgBase64.size());
-				uchar* buffer=(uchar*)deImgBase64.c_str();
-				int size=deImgBase64.length();
+				// std::cout<<"Reading image base64 code"<<std::endl;
+				std::string tempImgBase64 = spRedis->get(spRedis->keyImage);
+                                int pos = tempImgBase64.find(",");
+                                string getImgBase64 = tempImgBase64.substr(pos+1);
+				// std::cout<<"Base64 code length: "<<getImgBase64.length()<<std::endl;
+    			        std::string deImgBase64 = base64.Decode(getImgBase64.c_str(), getImgBase64.size());
+    		                vector<uchar> data(deImgBase64.begin(), deImgBase64.end());
+				image = cv::imdecode(data,1);
+  			        cv::imencode(".jpg", image, mat_data);
+				uchar* buffer=(uchar*)mat_data.data();
+				int size=mat_data.size();
 				sprintf(header,"sz:%d", size);
 				sendMessage(header);
 				while(1){
@@ -111,7 +119,7 @@ void Client::listenAndSendFrame(){
 					}
 				}
 				sendSingleImageBuff(buffer,size);
-				cout<<"frame: "<<frameIndex<<endl;
+				// cout<<"frame: "<<frameIndex<<endl;
 				++frameIndex;
 				
 #ifdef FINITE_FRAMES

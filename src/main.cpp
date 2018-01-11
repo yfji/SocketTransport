@@ -7,7 +7,7 @@
 #include <thread>
 #include <chrono>
 
-static const std::string databaseName="yg_sql";
+static const std::string databaseName="project";
 static const std::vector<std::string> tableNames={"yg_user_images","yg_action"};
 static std::shared_ptr<DatabaseManager> spDbManager;
 static std::shared_ptr<Estimator> spEstimator;
@@ -17,7 +17,7 @@ void client_thread(Client* pClient){
 	if(pClient->connectServer()){
 		pClient->listenAndSendFrame();
 	}
-	std::cout<<"send frame finished"<<std::endl;
+	// std::cout<<"send frame finished"<<std::endl;
 }
 
 void server_read_data(ServerReadData* pServer){
@@ -29,18 +29,18 @@ void server_read_data(ServerReadData* pServer){
 	}
 	// cout<<"listening for pose data"<<endl;
 	pServer->receiveData();
-	std::cout<<"Read data finished"<<std::endl;
+	// std::cout<<"Read data finished"<<std::endl;
 }
 
 int solve_out(int argc, char** argv){
 	if(argc!=4 and argc!=3){
-		std::cout<<"you must provide at least the action_id and act_id, please check!"<<std::endl;
+		// std::cout<<"you must provide at least the action_id and act_id, please check!"<<std::endl;
 		return 1003;	//err code
 	}
 	
-	const std::string inetAddress="10.106.20.8";
-	int port=8910;
-	int keypoint_port=8912;
+	const std::string inetAddress="172.17.108.58";
+	int port=9010;
+	int keypoint_port=9012;
 	int uid, action_id, act_id;
 	if(argc==3){
 		uid=0;

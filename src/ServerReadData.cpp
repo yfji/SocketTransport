@@ -21,6 +21,8 @@ ServerReadData::ServerReadData(const string& ip, const int p, int _uid, int _act
 	bConnected=false;
 	frameIndex=0;
 	numEmptyData=0;
+	xScale=1080*1.0/368;
+	yScale=1920*1.0/656;
 }
 
 ServerReadData:: ~ServerReadData(){
@@ -55,7 +57,7 @@ bool ServerReadData::startAccept(){
 		// cout<<"reader socket accept error"<<endl;
 		return false;
 	}
-	cout<<"reader socket connect successfully"<<endl;
+	// cout<<"reader socket connect successfully"<<endl;
 	bConnected=true;
 	return true;
 }
@@ -72,6 +74,10 @@ void ServerReadData::readPoseData(std::string& poseData){
 	for(auto i=0;i<limbNum;++i){
 		cv::Point2f p1(openposePeaks[limbSeq[i][0]][0], openposePeaks[limbSeq[i][0]][1]);
 		cv::Point2f p2(openposePeaks[limbSeq[i][1]][0], openposePeaks[limbSeq[i][1]][1]);
+		p1.x=p1.x*xScale;
+		p1.y=p1.y*yScale;
+		p2.x=p2.x*xScale;
+		p2.y=p2.y*yScale;
 		if((p1.x>0.1 or p1.y>0.1) and (p2.x>0.1 or p2.y>0.1)){
 			color=1;
 			if(i==5 or i==6)
@@ -109,12 +115,13 @@ void ServerReadData::receiveData(){
 		std::string poseData="";
 		if(strcmp(buff, "nop")==0){
 			/***no person in image***/
-			spRedis->set("result", "0");
+			spRedis->set(spRedis->keyResult, "0");
 		}
 		else{
     		spEstimator->readOpenposePeaks(buff);
+    		
     		std::string actPath = spDbManager->getTxtFromDatabase(action_id, act_id); 
-			std::cout<<"actPath : "<<actPath<<std::endl;
+			// std::cout<<"actPath : "<<actPath<<std::endl;
 			/***obtain the standard keypoint peaks according to the act_id***/
 			double poseScore=0;
 			std::string txtPathDatabase="";
@@ -123,16 +130,18 @@ void ServerReadData::receiveData(){
 				/***calculate the score of each part***/
 				poseScore =spEstimator->calcScoreBody();
 				poseScore=spEstimator->normalize(poseScore);
-				std::cout<<"Score: "<<poseScore<<std::endl;
+				// std::cout<<"Score: "<<poseScore<<std::endl;
 			}
 			if(poseScore>70){
-				spRedis->set("result", "1");
+				spRedis->set(spRedis->keyResult, "1");
 			}
 			else{
-				spRedis->set("result", "0");
+				spRedis->set(spRedis->keyResult, "0");
 			}		
 		}
-		spRedis->set("pose", poseData);
+		readPoseData(poseData);	
+                // std::cout<<poseData<<std::endl;
+		spRedis->set(spRedis->keyPose, poseData);
 		frameIndex++;
 		sendMessage("data");
 		usleep(5);

@@ -11,22 +11,25 @@
 class Redis
 {
 public:
-
     Redis(){}
-
     ~Redis()
     {
         this->_connect = NULL;
         this->_reply = NULL;                
     }
+	const std::string keyImage="ImgData";
+	const std::string keyResult="Result";
+	const std::string keyPose="PoseData";
+
     bool connect()
     {
         this->_connect = redisConnect(inetAddress.c_str(), defaultPort);
         if(this->_connect != NULL && this->_connect->err)
         {
-            printf("connect error: %s\n", this->_connect->errstr);
+            // printf("redis connect error: %s\n", this->_connect->errstr);
             return 0;
         }
+		// printf("redis connect successfully\n");
         return 1;
     }
 
@@ -35,9 +38,10 @@ public:
         this->_connect = redisConnect(host.c_str(), port);
         if(this->_connect != NULL && this->_connect->err)
         {
-            printf("connect error: %s\n", this->_connect->errstr);
+            // printf("redis connect error: %s\n", this->_connect->errstr);
             return 0;
         }
+		// printf("redis connect successfully\n");
         return 1;
     }
 
