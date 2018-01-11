@@ -6,6 +6,7 @@
 #include <string>
 #include <stdio.h>
 #include <mutex>
+#include <map>
 #include <hiredis/hiredis.h>
 
 class Redis
@@ -20,6 +21,8 @@ public:
 	const std::string keyImage="ImgData";
 	const std::string keyResult="Result";
 	const std::string keyPose="PoseData";
+	const std::string keyPortValue="port_value";
+	const std::string keyPortUse="port_use";
 
     bool connect()
     {
@@ -61,7 +64,12 @@ public:
         redisCommand(this->_connect, "SET %s %s", key.c_str(), value.c_str());
         mMutex.unlock();
     }
-
+	
+	void setPortPairState(int state){
+	}
+	std::pair<int,int> getAvailablePortPair(){
+		i
+		
 private:
 
     redisContext* _connect;
@@ -70,6 +78,7 @@ private:
     std::mutex mMutex;
     const std::string inetAddress="localhost";
     const int defaultPort= 6379;
+    int numPortPair;
 
 };
 

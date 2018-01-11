@@ -113,7 +113,7 @@ void ServerReadData::receiveData(){
 		}
 		else{
     		spEstimator->readOpenposePeaks(buff);
-    		readPoseData(poseData);
+    		
     		std::string actPath = spDbManager->getTxtFromDatabase(action_id, act_id); 
 			// std::cout<<"actPath : "<<actPath<<std::endl;
 			/***obtain the standard keypoint peaks according to the act_id***/
@@ -125,6 +125,7 @@ void ServerReadData::receiveData(){
 				poseScore =spEstimator->calcScoreBody();
 				poseScore=spEstimator->normalize(poseScore);
 				// std::cout<<"Score: "<<poseScore<<std::endl;
+				readPoseData(poseData);
 			}
 			if(poseScore>70){
 				spRedis->set(spRedis->keyResult, "1");
