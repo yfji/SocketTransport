@@ -230,7 +230,6 @@ void ClientReadData::receiveData(){
 		else{
 			spEstimator->readOpenposePeaks(buff);
     		
-    		readPoseData(poseData);
     		// std::cout<<poseData<<std::endl;
     		std::string actPath = spDbManager->getTxtFromDatabase(); 
     		
@@ -242,6 +241,7 @@ void ClientReadData::receiveData(){
 				poseScore =spEstimator->calcScoreBody();
 				poseScore=spEstimator->normalize(poseScore);
 				std::cout<<"Score: "<<poseScore<<std::endl;
+				readPoseData(poseData);
 #if SAVE_TXT==1
 				sprintf(txtStr, "%d.txt", (frameIndex+1));
 				txtPathDatabase=txtDealPath+std::string(txtStr);
