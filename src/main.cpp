@@ -84,14 +84,14 @@ int main(int argc, char** argv){
 	if(not spRedis->connect()){
 		return 1003;
 	}
-	bool ok=redis.readAvailablePorts(ports);
+	bool ok=spRedis->readAvailablePorts(ports);
 	if(ok){
 		//std::cout<<"Ports available: "<<ports[0]<<","<<ports[1]<<std::endl;
-		if(ports[0]==-1 or ports[1]==-1}
+		if(ports[0]==-1 or ports[1]==-1)
 			return 1003;
 	}
 	else{
-		redis.loadPortsFromFile("ports.cfg");
+		spRedis->loadPortsFromFile("ports.cfg");
 	}
 	return solve_out(argc, argv);
 }
