@@ -77,7 +77,7 @@ bool Estimator::readDatabasePeaks(const char* act_path){
 	std::ifstream in;
 	in.open(act_path, std::ios::in);
 	if(not in){
-		std::cout<<"Could not open action file!"<<std::endl;
+		// std::cout<<"Could not open action file!"<<std::endl;
 		return false;
 	}
 	for(size_t i=0;i<numKeypoints;++i){

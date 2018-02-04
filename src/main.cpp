@@ -12,12 +12,15 @@ static const std::vector<std::string> tableNames={"yg_user_images","yg_action"};
 static std::shared_ptr<DatabaseManager> spDbManager;
 static std::shared_ptr<Estimator> spEstimator;
 static std::shared_ptr<Redis> spRedis;
+static std::vector<int> ports={-1,-1};
+static int img_port;
+static int data_port;
 
 void client_thread(Client* pClient){
 	if(pClient->connectServer()){
 		pClient->listenAndSendFrame();
 	}
-	// std::cout<<"send frame finished"<<std::endl;
+	std::cout<<"send frame finished"<<std::endl;
 }
 
 void server_read_data(ServerReadData* pServer){
@@ -29,16 +32,16 @@ void server_read_data(ServerReadData* pServer){
 	}
 	// cout<<"listening for pose data"<<endl;
 	pServer->receiveData();
-	// std::cout<<"Read data finished"<<std::endl;
+	std::cout<<"Read data finished"<<std::endl;
 }
 
 int solve_out(int argc, char** argv){
 	if(argc!=4 and argc!=3){
-		// std::cout<<"you must provide at least the action_id and act_id, please check!"<<std::endl;
+		std::cout<<"you must provide at least the action_id and act_id, please check!"<<std::endl;
 		return 1003;	//err code
 	}
 	
-	const std::string inetAddress="172.17.108.58";
+	const std::string inetAddress="192.168.3.24";
 	int port=9010;
 	int keypoint_port=9012;
 	int uid, action_id, act_id;
@@ -53,8 +56,8 @@ int solve_out(int argc, char** argv){
 		act_id = std::atoi(argv[3]);
 	}
 	
-	Client client(inetAddress, port, uid, act_id);
-	ServerReadData dataReader(inetAddress, keypoint_port, uid, action_id, act_id);
+	Client client(inetAddress, ports[0], uid, act_id);
+	ServerReadData dataReader(inetAddress, ports[1], uid, action_id, act_id);
 	
 	client.setRedisPtr(spRedis);
 	dataReader.setDatabaseManager(spDbManager);
@@ -81,5 +84,21 @@ int main(int argc, char** argv){
 	if(not spRedis->connect()){
 		return 1003;
 	}
+	bool ok=spRedis->readAvailablePorts(ports);
+	if(ok){
+		std::cout<<"Ports available: "<<ports[0]<<","<<ports[1]<<std::endl;
+		if(ports[0]==-1 or ports[1]==-1)
+			return 1003;
+	}
+	else{
+		std::cout<<"No result"<<std::endl;
+		spRedis->loadPortsFromFile("ports.cfg");
+		ok=spRedis->readAvailablePorts(ports);
+		if(ok){
+			if(ports[0]==-1 or ports[1]==-1)
+				return 1003;
+		}	
+	}
+	sleep(2);
 	return solve_out(argc, argv);
 }

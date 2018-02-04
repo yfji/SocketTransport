@@ -15,8 +15,8 @@
 #ifdef IN
 #define INETADDR	"10.106.18.187"
 #else
-#define OUTADDR    "172.17.108.58"
-#define INETADDR	"172.17.108.58"
+#define OUTADDR    "192.168.3.24"
+#define INETADDR	"192.168.3.24"
 #endif
 #define MAX_LEN	32768
 class Config {

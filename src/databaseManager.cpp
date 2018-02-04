@@ -18,7 +18,7 @@ DatabaseManager::DatabaseManager(const DatabaseManager& dbManager){
 DatabaseManager::DatabaseManager(const std::string& ip, \
                                            const std::string& user, \
                                            const std::string& passwd)
-{
+{http://localhost/
     isDatabaseConnected=false;
     isNewQuery=false;
     frameIndex=0;
@@ -105,6 +105,7 @@ std::string DatabaseManager::getTxtFromDatabase(int action_id, int act_id){
     }
 	  std::stringstream cmd;
 	  cmd<<"select id, action_txt from "<<tableNames[1]<<" where action_id = '"<<action_id<<"' and act_id = '"<<act_id<<"'";
+          
 	  res = mysql_query(&conn, cmd.str().c_str());
 	  if(res){
 		  release();
@@ -112,6 +113,7 @@ std::string DatabaseManager::getTxtFromDatabase(int action_id, int act_id){
 	  }
     result = mysql_store_result(&conn);
     int rowcount = mysql_num_rows(result);
+    // std::cout<<rowcount<<std::endl;
     if(rowcount==0){
         // std::cout<<"No item selected, please check!"<<std::endl;
         return "";
