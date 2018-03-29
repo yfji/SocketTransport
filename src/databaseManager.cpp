@@ -51,23 +51,25 @@ DatabaseManager& DatabaseManager::operator=(const DatabaseManager& dbManager){
 }
 
 bool DatabaseManager::queryImage(int uid, int act_id){
+        int img_num[4] = {3,4,6,4};
 	const std::lock_guard<std::mutex> lock{databaseMutex};
 	std::stringstream image_cmd;
-	image_cmd<<"select id,img_url from "<<tableNames[0]<<" where uid = '"<<uid<<"' and action_id = '"<<act_id<<"'";
+	//image_cmd<<"select id,img_url from "<<tableNames[0]<<" where uid = '"<<uid<<"' and action_id = '"<<act_id<<"'";
+	image_cmd<<"select id,img_url from "<<tableNames[0]<<" where uid = '"<<uid<<"' and action_id = '"<<act_id<<"'"<<" order by id desc limit "<<img_num[act_id-5];
 	int res = mysql_query(&conn, image_cmd.str().c_str());
 	if(res){
 		release();
-		std::cout<<"Query database for image error!"<<std::endl;
+		//std::cout<<"Query database for image error!"<<std::endl;
 		return false;
 	}
     result = mysql_store_result(&conn);
     int rowcount = mysql_num_rows(result);
     if(rowcount==0){
-        std::cout<<"No item selected, please check!"<<std::endl;
+        //std::cout<<"No item selected, please check!"<<std::endl;
         return false;
     }
     if(recordCount!=0 and recordCount!=rowcount){
-    	std::cout<<"Numbers of standard image and txt are not the same, please check!"<<std::endl;
+    	//std::cout<<"Numbers of standard image and txt are not the same, please check!"<<std::endl;
         return false;
     }
     recordCount=rowcount;
@@ -78,7 +80,7 @@ bool DatabaseManager::queryImage(int uid, int act_id){
         imageIds.push_back(imgId);
         imagesOneQuery.push_back(cv::imread(name));
     }
-    std::cout<<imagesOneQuery.size()<<" images selected"<<std::endl;
+    //std::cout<<imagesOneQuery.size()<<" images selected"<<std::endl;
     return true;
 }
 
@@ -89,17 +91,17 @@ bool DatabaseManager::queryTxt(int act_id){
 	int res = mysql_query(&conn, txt_cmd.str().c_str());
 	if(res){
 		release();
-		std::cout<<"Query database for txt error!"<<std::endl;
+		//std::cout<<"Query database for txt error!"<<std::endl;
 		return false;
 	}
     result = mysql_store_result(&conn);
     int rowcount = mysql_num_rows(result);
     if(rowcount==0){
-        std::cout<<"No item selected, please check!"<<std::endl;
+        //std::cout<<"No item selected, please check!"<<std::endl;
         return false;
     }
     if(recordCount!=0 and recordCount!=rowcount){
-    	std::cout<<"Numbers of txt and standard image are not the same, please check!"<<std::endl;
+    	//std::cout<<"Numbers of txt and standard image are not the same, please check!"<<std::endl;
         return false;
     }
     recordCount=rowcount;
@@ -111,7 +113,7 @@ bool DatabaseManager::queryTxt(int act_id){
         txtIds.push_back(txtId);
         txtsOneQuery.push_back(txtPath);
     }
-    std::cout<<txtsOneQuery.size()<<" txts selected"<<std::endl;
+    //std::cout<<txtsOneQuery.size()<<" txts selected"<<std::endl;
     return true;
 }
 
@@ -155,10 +157,10 @@ bool DatabaseManager::writeScoreToDatabase(const double score){
     int res = mysql_query(&conn, cmd.str().c_str());
 	if(res){
 		release();
-		std::cout<<"Update "<<tableNames[0]<<" for score error!"<<std::endl;
+		//std::cout<<"Update "<<tableNames[0]<<" for score error!"<<std::endl;
 		return false;
 	}
-    std::cout<<"Write scores successfully"<<std::endl;
+    //std::cout<<"Write scores successfully"<<std::endl;
     return true;
 }
 
@@ -169,10 +171,10 @@ bool DatabaseManager::writeImageUrlToDatabase(const std::string& imgurl){
     int res = mysql_query(&conn, cmd.str().c_str());
 	if(res){
 		release();
-		std::cout<<"Update "<<tableNames[0]<<" for image url error!"<<std::endl;
+		//std::cout<<"Update "<<tableNames[0]<<" for image url error!"<<std::endl;
 		return false;
 	}
-    std::cout<<"Write image url successfully"<<std::endl;
+    //std::cout<<"Write image url successfully"<<std::endl;
     return true;
 }
 
@@ -183,10 +185,10 @@ bool DatabaseManager::writeTxtUrlToDatabase(const std::string& txtUrl){
     int res = mysql_query(&conn, cmd.str().c_str());
 	if(res){
 		release();
-		std::cout<<"Update "<<tableNames[0]<<" for txt url error!"<<std::endl;
+		//std::cout<<"Update "<<tableNames[0]<<" for txt url error!"<<std::endl;
 		return false;
 	}
-    std::cout<<"Write txt url successfully"<<std::endl;
+    //std::cout<<"Write txt url successfully"<<std::endl;
     return true;
 }
 
@@ -197,10 +199,10 @@ bool DatabaseManager::writePoseDataToDatabase(const std::string& data){
     int res = mysql_query(&conn, cmd.str().c_str());
 	if(res){
 		release();
-		std::cout<<"Update "<<tableNames[0]<<" for pose data error!"<<std::endl;
+		//std::cout<<"Update "<<tableNames[0]<<" for pose data error!"<<std::endl;
 		return false;
 	}
-    std::cout<<"Write pose data successfully"<<std::endl;
+    //std::cout<<"Write pose data successfully"<<std::endl;
     return true;
 }
 

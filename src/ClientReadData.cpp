@@ -193,8 +193,8 @@ void ClientReadData::receiveData(){
 	mkdir((txtBasePath+txtDealPath).c_str(),S_IRWXU);
 	imgDealPath += "/";
 	txtDealPath += "/";
-	std::cout<<"ImgUrl: "<<imgDealPath<<std::endl;
-	std::cout<<"txtUrl: "<<txtDealPath<<std::endl;
+	//std::cout<<"ImgUrl: "<<imgDealPath<<std::endl;
+	//std::cout<<"txtUrl: "<<txtDealPath<<std::endl;
 	
 	bool hasPerson=true;
 	bool queryOK=spDbManager->queryTxt(action_id);
@@ -209,7 +209,7 @@ void ClientReadData::receiveData(){
 		int rn=recv(clientsd, buff, sizeof(buff), 0);
 		buff[rn]='\0';
 		if(rn==0){
-			std::cout<<"No valid data"<<std::endl;
+			//std::cout<<"No valid data"<<std::endl;
 			usleep(50);
 			continue;
 		}
@@ -223,7 +223,7 @@ void ClientReadData::receiveData(){
 		hasPerson=true;
 		/***no person in image***/
 		if(strcmp(buff, "nop")==0){
-			std::cout<<"nop"<<std::endl;
+			//std::cout<<"nop"<<std::endl;
 			hasPerson=false;
 			// DO SOMETHING
 		}
@@ -235,12 +235,12 @@ void ClientReadData::receiveData(){
     		
     		/***obtain the standard keypoint peaks according to the act_id***/
 			if(actPath!=""){
-				std::cout<<"actPath : "<<actPath<<std::endl;
+				//std::cout<<"actPath : "<<actPath<<std::endl;
 				spEstimator->readDatabasePeaks(actPath.c_str());	
 				/***calculate the score of each part***/
 				poseScore =spEstimator->calcScoreBody();
 				poseScore=spEstimator->normalize(poseScore);
-				std::cout<<"Score: "<<poseScore<<std::endl;
+				//std::cout<<"Score: "<<poseScore<<std::endl;
 				readPoseData(poseData);
 #if SAVE_TXT==1
 				sprintf(txtStr, "%d.txt", (frameIndex+1));
@@ -265,10 +265,10 @@ void ClientReadData::receiveData(){
 		
 		/****update image url, txt url and pose data****/
 		spDbManager->writeImageUrlToDatabase(imgPathDatabase);
-		// spDbManager->writeTxtUrlToDatabase(txtPathDatabase);
+		spDbManager->writeTxtUrlToDatabase(txtPathDatabase);
 		// spDbManager->writePoseDataToDatabase(poseData);
 		
-		std::cout<<"Write records successfully"<<std::endl;
+		//std::cout<<"Write records successfully"<<std::endl;
 		
 		spDbManager->writeCountPP();
 		

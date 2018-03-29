@@ -25,7 +25,7 @@ double EstimatorCosine::calcScoreLimb(std::vector<int>& keypointIds, int limbInd
 	stdVisible= (stdx>0.1 or stdy>0.1);
 	refVisible= (refx>0.1 or refy>0.1);
 	if(not stdVisible or not refVisible){
-		std::cout<<"Base keypoint must be visible!: "<<limbIndex<<std::endl;
+		//std::cout<<"Base keypoint must be visible!: "<<limbIndex<<std::endl;
 		memset(limbCorrect, 0, sizeof(limbCorrect));
 		return 0;
 	}
@@ -54,12 +54,12 @@ double EstimatorCosine::calcScoreLimb(std::vector<int>& keypointIds, int limbInd
 			delta_stdy=databasePeaks[stdVisibleIndex[1]][1]-databasePeaks[stdVisibleIndex[0]][1];
 			delta_refx=openposePeaks[refVisibleIndex[1]][0]-openposePeaks[refVisibleIndex[0]][0];
 			delta_refy=openposePeaks[refVisibleIndex[1]][1]-openposePeaks[refVisibleIndex[0]][1];
-			std::cout<<keypointIds[i]<<":"<<"("<<delta_stdx<<","<<delta_stdy<<")"<<",("<<delta_refx<<","<<delta_refy<<")";
+			//std::cout<<keypointIds[i]<<":"<<"("<<delta_stdx<<","<<delta_stdy<<")"<<",("<<delta_refx<<","<<delta_refy<<")";
 			double prod=delta_stdx*delta_refx+delta_stdy*delta_refy;
 			double mag=std::sqrt(delta_stdx*delta_stdx+delta_stdy*delta_stdy)*std::sqrt(delta_refx*delta_refx+delta_refy*delta_refy);
 			double limbScore=prod/mag;
 			double ang=std::acos(limbScore)*180/3.1415926;
-			std::cout<<": "<<limbScore<<std::endl;
+			//std::cout<<": "<<limbScore<<std::endl;
 			if(ang>angleHighest){
 				FILL_ARRAY(limbCorrect, limbIndex, i, 0)
 				// if(limbIndex<2){
@@ -102,6 +102,6 @@ double EstimatorCosine::calcScoreBody(){
 	double leftArmScore=calcScoreLimb(leftArm, 1);
 	double rightLegScore=calcScoreLimb(rightLeg, 2);
 	double leftLegScore=calcScoreLimb(leftLeg, 3);
-	std::cout<<std::endl;
+	//std::cout<<std::endl;
 	return (rightArmScore+leftArmScore+rightLegScore+leftLegScore)*1.0/4;
 }

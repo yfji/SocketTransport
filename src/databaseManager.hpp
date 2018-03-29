@@ -34,21 +34,23 @@ public:
                                      const std::vector<std::string>& tables){
 		databaseName=database;
 		tableNames=tables;
-		std::cout<<"databaseName:"<<std::endl;
-		std::cout<<'\t'<<databaseName<<std::endl;
-		std::cout<<"table names:"<<std::endl;
-		for(size_t i=0;i<tableNames.size();++i){
-			std::cout<<'\t'<<tableNames[i]<<std::endl;
-		}
+		//std::cout<<"databasename:"<<std::endl;
+		//std::cout<<'\t'<<databasename<<std::endl;
+		//std::cout<<"table names:"<<std::endl;
+		//for(size_t i=0;i<tableNames.size();++i){
+		//	std::cout<<'\t'<<tableNames[i]<<std::endl;
+		//}
 	}
 	inline bool connectDatabase(){
 		mysql_init(&conn);
 		isDatabaseConnected=mysql_real_connect(&conn,serverAddress.c_str(),userName.c_str(),password.c_str(),databaseName.c_str(),0,NULL,CLIENT_FOUND_ROWS);
 		if(not isDatabaseConnected){
-			std::cout<<"Connect database error!"<<std::endl;
+			//std::cout<<"Connect database error!"<<std::endl;
+			;
 		}
 		else{
-			std::cout<<"connect database successfully"<<std::endl<<std::endl;
+			//std::cout<<"connect database successfully"<<std::endl<<std::endl;
+			;
 		}
 		return isDatabaseConnected;
 	}

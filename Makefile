@@ -11,7 +11,7 @@ OBJ_DIR := $(BUILD_DIR)
 DEP_DIR := $(BUILD_DIR)
 RM := rm -rf
 
-LIBRARIES := hiredis mysqlclient z m dl opencv_core opencv_highgui opencv_imgproc
+LIBRARIES := hiredis mysqlclient z m dl opencv_core opencv_highgui pthread rt opencv_imgproc
 
 CXX_SRCS := $(shell find $(SRC_DIRS) -name '*.cpp')
 CXX_OBJS := $(addprefix $(OBJ_DIR)/, $(CXX_SRCS:.cpp=.o))
