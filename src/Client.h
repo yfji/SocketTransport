@@ -43,6 +43,7 @@ private:
 	int frameIndex;
 	int numEmptyFrames;
 	bool bConnected;
+	int frames;
 public:
 	bool connectServer();
 	void sendMessage(const char* message);

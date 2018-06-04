@@ -32,6 +32,7 @@ Client::Client(const string& ip, const int p) {
 	frameIndex=0;
 	numEmptyFrames=0;
 	mVideoCap.open("/home/yfji/Workspace/C++/SocketTransport_train/single_person.mp4");
+	frames=mVideoCap.get(cv::CAP_PROP_FRAME_COUNT);
 }
 
 Client::~Client() {
@@ -111,7 +112,9 @@ void Client::listenAndSendFrame(){
 			if(frameIndex==500){
 				sendMessage("stop");
 			}
-
+			if(frameIndex==frames){
+				sendMessage("stop");
+			}
 			else{
 #endif
 				//string image_file=image_dir+image_files[frameIndex];
