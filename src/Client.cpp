@@ -112,7 +112,7 @@ void Client::listenAndSendFrame(){
 			if(frameIndex==500){
 				sendMessage("stop");
 			}
-			if(frameIndex==frames){
+			else if(frameIndex==frames){
 				sendMessage("stop");
 			}
 			else{
