@@ -49,7 +49,7 @@ public:
 	void sendSingleImage(char* image);
 	void sendSingleImageBuff(uchar* buffer, int size);
 
-    void listenAndSendFrame(loader_callback& func, char* flag);
+    void listenAndSendFrame(loader_callback* func, char* flag);
 };
 
 #endif /* SRC_CLIENT_H_ */

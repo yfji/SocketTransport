@@ -39,6 +39,7 @@ private:
     void randomColors();
 
 public:
+    std::string filename;
     cv::VideoCapture * cap_ptr;
 
     bool connect();

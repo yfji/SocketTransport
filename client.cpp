@@ -77,7 +77,7 @@ void Client::sendSingleImageBuff(uchar* buffer, int size){
 	}
 }
 
-void Client::listenAndSendFrame(loader_callback& func, char* flag){
+void Client::listenAndSendFrame(loader_callback* func, char* flag){
 	char message[50];
 	strcpy(message, "");
     char* localFlag=flag;
@@ -95,8 +95,12 @@ void Client::listenAndSendFrame(loader_callback& func, char* flag){
                 sendMessage("stop");
             }
             else{
-				dataMutex.lock();
-                image=func();
+                //dataMutex.lock();
+                image=(*func)();
+                if(image.empty()){
+                    sendMessage("stop");
+                }
+                else{
                 /*
                  * move to SocketManager
 #if	RESIZE==1
@@ -107,38 +111,39 @@ void Client::listenAndSendFrame(loader_callback& func, char* flag){
 				dataMutex.unlock();
                 */
 
-				char header[50];
+                    char header[50];
 #ifdef COMPRESS
-				vector<uchar> mat_data;
-				cv::imencode(".jpg", image, mat_data);
-				uchar* buffer=(uchar*)mat_data.data();
-				int size=mat_data.size();
-				sprintf(header,"sz:%d", size);
+                    vector<uchar> mat_data;
+                    cv::imencode(".jpg", image, mat_data);
+                    uchar* buffer=(uchar*)mat_data.data();
+                    int size=mat_data.size();
+                    sprintf(header,"sz:%d", size);
 #else
-				uchar* buffer=image.data;
-				int size=image.rows*image.cols*image.channels();
-				sprintf(header,"sz:%d,%d,%d\0",image.cols,image.rows,image.channels());
+                    uchar* buffer=image.data;
+                    int size=image.rows*image.cols*image.channels();
+                    sprintf(header,"sz:%d,%d,%d\0",image.cols,image.rows,image.channels());
 #endif
-				sendMessage(header);
-				while(1){
-					int rn=recv(clientsd, message, sizeof(message), 0);
-					message[rn]='\0';
-					if(strcmp(message, "sz")==0){
-						break;
-					}
-				}
+                    sendMessage(header);
+                    while(1){
+                        int rn=recv(clientsd, message, sizeof(message), 0);
+                        message[rn]='\0';
+                        if(strcmp(message, "sz")==0){
+                            break;
+                        }
+                    }
 #ifndef SIMPLE
-				sendMessage("image");
-				while(1){
-					int rn=recv(clientsd, message, sizeof(message), 0);
-					message[rn]='\0';
-					if(strcmp(message, "image")==0)
-						break;
-				}
+                    sendMessage("image");
+                    while(1){
+                        int rn=recv(clientsd, message, sizeof(message), 0);
+                        message[rn]='\0';
+                        if(strcmp(message, "image")==0)
+                            break;
+                    }
 #endif
-				sendSingleImageBuff(buffer,size);
-                //cout<<"frame: "<<frameIndex<<endl;
-                //++frameIndex;
+                    sendSingleImageBuff(buffer,size);
+                    //cout<<"frame: "<<frameIndex<<endl;
+                    //++frameIndex;
+                }
 			}
 		}
 		else if(strcmp(message, "stop")==0){

@@ -51,13 +51,12 @@ cv::Mat SocketManager::getImage(){
     frame.copyTo(globalFrames[sendFrameId]);
     sendFrameId=(sendFrameId+1)%maxQueueLen;
     dataMutex.unlock();
-
     return frame;
 }
 
 void SocketManager::runSendingThread(char* flag){
     loader_callback loader_func=std::bind(&SocketManager::getImage,this);
-    client_ptr->listenAndSendFrame(loader_func, flag);
+    client_ptr->listenAndSendFrame(&loader_func, flag);
 }
 
 void SocketManager::runReceivingThread(draw_callback* func){

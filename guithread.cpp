@@ -22,15 +22,17 @@ void GUIThread::run(){
     std::string ref_video=filenames[0];
     std::string user_video=filenames[1];
 
-    cv::VideoCapture cap_ref(ref_video);
-    cv::VideoCapture cap_user(user_video);
+    cv::VideoCapture cap_ref;
+    cap_ref.open(ref_video);
+    cv::VideoCapture cap_user;
+    cap_user.open(user_video);
 
     int fps_ref=cap_ref.get(CV_CAP_PROP_FPS);
     int fps_user=cap_user.get(CV_CAP_PROP_FPS);
 
     int fps=std::min(fps_ref, fps_user);
 
-    int interval=(int)(1.0*1000/fps);
+    int interval=(int)(1.0*1e6/fps);
 
     assert(cap_ref.isOpened() && cap_user.isOpened());
 
@@ -54,5 +56,6 @@ void GUIThread::run(){
         func(frame_user, frame_ref);
         //can not use waitkey in sub thread
         //cv::waitKey(interval);
+        usleep(interval);
     }
 }

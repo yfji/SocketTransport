@@ -109,9 +109,9 @@ void ClientReadData::receiveData(draw_callback* func, Bundle* bundle){
 				sendMessage("data");
 				continue;
 			}
-            //dataMutex.lock();
+            dataMutex.lock();
             globalFrames[recvFrameId].copyTo(canvas);
-            //dataMutex.unlock();
+            dataMutex.unlock();
 
             estimator_ptr->readOpenposePeaks(buff);
             std::vector<DataRow> peaks=estimator_ptr->getOpenposePeaks();
