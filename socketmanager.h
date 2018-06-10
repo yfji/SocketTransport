@@ -38,9 +38,13 @@ private:
 
     void randomColors();
 
+    std::vector<int> limbSeq={
+        0,1,1,2,1,8,1,5,1,11,2,3,3,4,5,6,6,7,8,9,9,10,11,12,12,13
+    };
+
 public:
     std::string filename;
-    cv::VideoCapture * cap_ptr;
+    cv::VideoCapture * cap_ptr = {nullptr};
 
     bool connect();
     void disconnect();

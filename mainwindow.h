@@ -66,7 +66,10 @@ private:
 
     SocketManager sManager;
 
+    draw_callback draw_func;
     std::shared_ptr<GUIThread> thread_ptr;
+    std::thread client_thread;
+    std::thread read_thread;
 
 private:
     virtual void paintEvent(QPaintEvent *e);

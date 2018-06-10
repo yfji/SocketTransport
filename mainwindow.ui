@@ -72,23 +72,52 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>390</x>
-      <y>440</y>
-      <width>89</width>
-      <height>25</height>
+      <x>240</x>
+      <y>444</y>
+      <width>81</width>
+      <height>51</height>
      </rect>
     </property>
     <property name="text">
      <string>Play</string>
     </property>
    </widget>
+   <widget class="QGroupBox" name="groupBox_3">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>420</y>
+      <width>131</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Speed</string>
+    </property>
+    <widget class="QLabel" name="txt_speed">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>111</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="margin">
+      <number>1</number>
+     </property>
+    </widget>
+   </widget>
    <widget class="QPushButton" name="btn_stop">
     <property name="geometry">
      <rect>
-      <x>390</x>
-      <y>480</y>
-      <width>89</width>
-      <height>25</height>
+      <x>330</x>
+      <y>444</y>
+      <width>81</width>
+      <height>51</height>
      </rect>
     </property>
     <property name="text">

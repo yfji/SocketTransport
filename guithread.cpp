@@ -27,6 +27,9 @@ void GUIThread::run(){
     cv::VideoCapture cap_user;
     cap_user.open(user_video);
 
+    //cv::VideoCapture* ref_ptr=&cap_ref;
+    //cv::VideoCapture* user_ptr=&cap_user;
+
     int fps_ref=cap_ref.get(CV_CAP_PROP_FPS);
     int fps_user=cap_user.get(CV_CAP_PROP_FPS);
 
@@ -39,6 +42,8 @@ void GUIThread::run(){
     while(1){
         cap_ref.read(frame_ref);
         cap_user.read(frame_user);
+        //ref_ptr->read(frame_ref);
+        //user_ptr->read(frame_user);
 
         if(!frame_ref.empty()){
             cv::resize(frame_ref, frame_ref, sizes[1], cv::INTER_LINEAR);

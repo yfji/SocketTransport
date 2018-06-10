@@ -42,6 +42,7 @@ std::vector<DataRow> SocketManager::getPoseData(const char* pose_ptr){
 }
 
 cv::Mat SocketManager::getImage(){
+    assert(cap_ptr!=nullptr);
     cv::Mat frame;
     dataMutex.lock();
     cap_ptr->read(frame);
@@ -70,17 +71,21 @@ void SocketManager::drawConnections(cv::Mat& image, std::vector<DataRow>& pose_d
     char rand=(color=="rand"?1:0);
 
     assert(np<=pose_data.size());
-    for(auto i=0;i<np-1;++i){
-        int xA=std::get<0>(pose_data[i]);
-        int yA=std::get<1>(pose_data[i]);
-        int xB=std::get<0>(pose_data[i+1]);
-        int yB=std::get<1>(pose_data[i+1]);
-        scalarA=(rand==0?colors[color]:pallete[i]);
-        scalarB=(rand==0?colors[color]:pallete[i+1]);
+    for(auto i=0;i<np;i+=2){
+        int start=limbSeq[i];
+        int end=limbSeq[i+1];
+        int xA=std::get<0>(pose_data[start]);
+        int yA=std::get<1>(pose_data[start]);
+        int xB=std::get<0>(pose_data[end]);
+        int yB=std::get<1>(pose_data[end]);
 
-        cv::line(image, cv::Point(xA,yA), cv::Point(xB,yB), scalarA, 2);
-        cv::circle(image, cv::Point(xA,yA), 4, scalarA, -1);
-        cv::circle(image, cv::Point(xB,yB), 4, scalarB, -1);
+        if(xA>0 && yA>0 && xB>0 && yB>0){
+            scalarA=(rand==0?colors[color]:pallete[i]);
+            scalarB=(rand==0?colors[color]:pallete[i+1]);
+            cv::line(image, cv::Point(xA,yA), cv::Point(xB,yB), scalarA, 2);
+            cv::circle(image, cv::Point(xA,yA), 4, scalarA, -1);
+            cv::circle(image, cv::Point(xB,yB), 4, scalarB, -1);
+        }
     }
 }
 

@@ -20,8 +20,10 @@ MainWindow::MainWindow(QWidget *parent) :
     thread_ptr->setSizes({user_size, ref_size});
 
     callback func=std::bind(&MainWindow::my_update_ui,this,std::placeholders::_1,std::placeholders::_2);
-    thread_ptr->setCallback(func);
+    thread_ptr->setCallback(func);  //reference of func
     connectSlots();
+
+    draw_func=std::bind(&MainWindow::drawUserImage,this,std::placeholders::_1,std::placeholders::_2);
 }
 
 MainWindow::~MainWindow()
@@ -128,13 +130,8 @@ void MainWindow::playNetworkPose(){
 
     sManager.cap_ptr=&cap_user;
 
-    draw_callback draw_func=std::bind(&MainWindow::drawUserImage,this,std::placeholders::_1,std::placeholders::_2);
-
-    std::thread send_thread(&SocketManager::runSendingThread, &sManager, &flag);
-    std::thread receive_thread(&SocketManager::runReceivingThread, &sManager, &draw_func);
-
-    //send_thread.join();
-    //receive_thread.join();
+    client_thread=std::thread(&SocketManager::runSendingThread, &sManager, &flag);
+    read_thread=std::thread(&SocketManager::runReceivingThread, &sManager, &draw_func);
 }
 
 void MainWindow::readStandardPoseFile(){
