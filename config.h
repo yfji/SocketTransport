@@ -22,5 +22,5 @@
 #define IMAGE_PORT  9010
 #define DATA_PORT   9012
 
-#define RESIZE	0
+#define RESIZE	1
 #define MAX_LEN	32768

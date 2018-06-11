@@ -90,19 +90,24 @@ void MainWindow::drawUserImage(cv::Mat& image, std::vector<DataRow>& poseData){
     readStandardPoseFile();
     //alignStandardUser(poseData);
     sManager.drawConnections(image, poseData, num_parts);
-    frame_user=image;
-    cap_ref.read(frame_ref);
+    /****change the reference or the content of frame_user will trigger the update event!!!why?***/
+    //frame_user=image;
+    cv::Mat tmp;
+    cap_ref.read(tmp);
 
-    if(!frame_ref.empty()){
-        sManager.drawConnections(frame_ref, poseData, num_parts, "green");
-        cv::resize(frame_ref, frame_ref, ref_size, cv::INTER_LINEAR);
-        cv::cvtColor(frame_ref, frame_ref, cv::COLOR_BGR2RGB);
+    if(!tmp.empty()){
+        sManager.drawConnections(tmp, poseData, num_parts, "green");
+        cv::resize(tmp, tmp, ref_size, cv::INTER_LINEAR);
+        cv::cvtColor(tmp, tmp, cv::COLOR_BGR2RGB);
+        frame_ref=tmp;
     }
-    if(!frame_user.empty()){
-        cv::resize(frame_user, frame_user, user_size, cv::INTER_LINEAR);
-        cv::cvtColor(frame_user, frame_user, cv::COLOR_BGR2RGB);
+    if(!image.empty()){
+        cv::resize(image, image, user_size, cv::INTER_LINEAR);
+        cv::cvtColor(image, image, cv::COLOR_BGR2RGB);
+        frame_user=image;
     }
     this->update();
+
 }
 
 void MainWindow::my_update_ui(cv::Mat& userImg, cv::Mat& refImg){
@@ -117,6 +122,7 @@ void MainWindow::playNetworkPose(){
         return;
     }
     state=CONNECTED;
+    flag=1;
 
     cap_ref.open(videoNames[0]);
     cap_user.open(videoNames[1]);
@@ -129,7 +135,7 @@ void MainWindow::playNetworkPose(){
     sManager.cap_ptr=&cap_user;
 
     client_thread=std::thread(&SocketManager::runSendingThread, &sManager, &flag);
-    read_thread=std::thread(&SocketManager::runReceivingThread, &sManager, &draw_func);
+    read_thread=std::thread(&SocketManager::runReceivingThread, &sManager, &draw_func, &flag);
 
     client_thread.detach(); //detach is very necessary!!!!!
     read_thread.detach();
@@ -161,6 +167,7 @@ void MainWindow::alignStandardUser(std::vector<DataRow>& poseData){  //align you
 
 void MainWindow::paintEvent(QPaintEvent *e)
 {
+    //std::cout<<"Update"<<std::endl;
     QImage q_frame_user = QImage((const unsigned char*)(frame_user.data), frame_user.cols, frame_user.rows, frame_user.cols*frame_user.channels(), QImage::Format_RGB888);
     QImage q_frame_ref = QImage((const unsigned char*)(frame_ref.data), frame_ref.cols, frame_ref.rows, frame_ref.cols*frame_ref.channels(), QImage::Format_RGB888);
 

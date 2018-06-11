@@ -56,10 +56,10 @@ void GUIThread::run(){
         if(frame_ref.empty() && frame_user.empty()){
             break;
         }
-        //can either use signal/slots or callback
+        /****can either use signal/slots or callback****/
         //emit update_ui_signal(frame_user, frame_ref);
         func(frame_user, frame_ref);
-        //can not use waitkey in sub thread
+        /****can not use waitkey in sub thread****/
         //cv::waitKey(interval);
         usleep(interval);
     }

@@ -59,7 +59,7 @@ public:
     inline void setCallback(draw_callback& callback){
         draw_func=callback;
     }
-    void receiveData(Bundle* bundle);
+    void receiveData(Bundle* bundle, char* flag);
 	void drawKeypoints(cv::Mat& frame);
 	inline void finishReceive(){}
 };

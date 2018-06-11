@@ -62,10 +62,10 @@ void SocketManager::runSendingThread(char* flag){
     client_ptr->listenAndSendFrame(flag);
 }
 
-void SocketManager::runReceivingThread(draw_callback* func){
+void SocketManager::runReceivingThread(draw_callback* func, char* flag){
     recvFrameId=0;
     reader_ptr->setCallback(*func);
-    reader_ptr->receiveData(&bundle);
+    reader_ptr->receiveData(&bundle, flag);
 }
 
 void SocketManager::drawConnections(cv::Mat& image, std::vector<DataRow>& pose_data, int np, std::string color){
