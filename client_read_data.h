@@ -42,6 +42,7 @@ private:
 	bool bConnected;
 	cv::Mat canvas;
 	
+    draw_callback draw_func;
     std::shared_ptr<Estimator> estimator_ptr;
 	void reset(const string& ip, const int p);
 	
@@ -55,7 +56,10 @@ public:
 	inline void sendMessage(const char* message){
 		send(clientsd, message, strlen(message), 0);
 	}
-    void receiveData(draw_callback* func, Bundle* bundle);
+    inline void setCallback(draw_callback& callback){
+        draw_func=callback;
+    }
+    void receiveData(Bundle* bundle);
 	void drawKeypoints(cv::Mat& frame);
 	inline void finishReceive(){}
 };

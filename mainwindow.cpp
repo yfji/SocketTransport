@@ -19,11 +19,10 @@ MainWindow::MainWindow(QWidget *parent) :
     thread_ptr.reset(new GUIThread(this, videoNames));
     thread_ptr->setSizes({user_size, ref_size});
 
+    draw_func=std::bind(&MainWindow::drawUserImage,this,std::placeholders::_1,std::placeholders::_2);
     callback func=std::bind(&MainWindow::my_update_ui,this,std::placeholders::_1,std::placeholders::_2);
     thread_ptr->setCallback(func);  //reference of func
     connectSlots();
-
-    draw_func=std::bind(&MainWindow::drawUserImage,this,std::placeholders::_1,std::placeholders::_2);
 }
 
 MainWindow::~MainWindow()
@@ -114,8 +113,7 @@ void MainWindow::my_update_ui(cv::Mat& userImg, cv::Mat& refImg){
 
 void MainWindow::playNetworkPose(){
     if(!sManager.connect()){
-        //qDebug()<<"No connection, exit";
-        ui->btn_play->setEnabled(true);
+        std::cout<<"No connection, exit"<<std::endl;
         return;
     }
     state=CONNECTED;
@@ -132,6 +130,9 @@ void MainWindow::playNetworkPose(){
 
     client_thread=std::thread(&SocketManager::runSendingThread, &sManager, &flag);
     read_thread=std::thread(&SocketManager::runReceivingThread, &sManager, &draw_func);
+
+    client_thread.detach(); //detach is very necessary!!!!!
+    read_thread.detach();
 }
 
 void MainWindow::readStandardPoseFile(){

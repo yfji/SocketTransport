@@ -43,13 +43,18 @@ private:
 	int numEmptyFrames;
 	bool bConnected;
 	int frames;
+
+    loader_callback loader_func;
 public:
+    inline void setCallback(loader_callback& callback){
+        loader_func=callback;
+    }
 	bool connectServer();
 	void sendMessage(const char* message);
 	void sendSingleImage(char* image);
 	void sendSingleImageBuff(uchar* buffer, int size);
 
-    void listenAndSendFrame(loader_callback* func, char* flag);
+    void listenAndSendFrame(char* flag);
 };
 
 #endif /* SRC_CLIENT_H_ */

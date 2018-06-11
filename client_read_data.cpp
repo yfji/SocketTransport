@@ -78,7 +78,7 @@ void ClientReadData::drawKeypoints(cv::Mat& frame){
 
 
 //use func to draw image and keypoints on the UI
-void ClientReadData::receiveData(draw_callback* func, Bundle* bundle){
+void ClientReadData::receiveData(Bundle* bundle){
     int frameCount=0;
 	double fps=0;
 
@@ -98,6 +98,7 @@ void ClientReadData::receiveData(draw_callback* func, Bundle* bundle){
 			continue;
 		}
 		if(strcmp(buff, "stop")==0){
+            cout<<"receive all data"<<endl;
 			break;
 		}
 		else if(strcmp(buff, "nop")==0){
@@ -118,7 +119,7 @@ void ClientReadData::receiveData(draw_callback* func, Bundle* bundle){
             //do something...
             //drawKeypoints(canvas);
 			// cv::imshow("frame", canvas); cv::waitKey(1);
-            (*func)(canvas, peaks);
+            draw_func(canvas, peaks);
 			auto now=std::chrono::high_resolution_clock::now();
             double duration_ns=(double)std::chrono::duration_cast<std::chrono::nanoseconds>(now-start).count();
 			double seconds=duration_ns/1e9;

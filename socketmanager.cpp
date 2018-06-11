@@ -56,14 +56,17 @@ cv::Mat SocketManager::getImage(){
 }
 
 void SocketManager::runSendingThread(char* flag){
+    sendFrameId=0;
     loader_callback loader_func=std::bind(&SocketManager::getImage,this);
-    client_ptr->listenAndSendFrame(&loader_func, flag);
+    client_ptr->setCallback(loader_func);
+    client_ptr->listenAndSendFrame(flag);
 }
 
 void SocketManager::runReceivingThread(draw_callback* func){
-    reader_ptr->receiveData(func, &bundle);
+    recvFrameId=0;
+    reader_ptr->setCallback(*func);
+    reader_ptr->receiveData(&bundle);
 }
-
 
 void SocketManager::drawConnections(cv::Mat& image, std::vector<DataRow>& pose_data, int np, std::string color){
     cv::Scalar scalarA;
@@ -82,9 +85,9 @@ void SocketManager::drawConnections(cv::Mat& image, std::vector<DataRow>& pose_d
         if(xA>0 && yA>0 && xB>0 && yB>0){
             scalarA=(rand==0?colors[color]:pallete[i]);
             scalarB=(rand==0?colors[color]:pallete[i+1]);
-            cv::line(image, cv::Point(xA,yA), cv::Point(xB,yB), scalarA, 2);
-            cv::circle(image, cv::Point(xA,yA), 4, scalarA, -1);
-            cv::circle(image, cv::Point(xB,yB), 4, scalarB, -1);
+            cv::line(image, cv::Point(xA,yA), cv::Point(xB,yB), scalarA, 4);
+            cv::circle(image, cv::Point(xA,yA), 8, scalarA, -1);
+            cv::circle(image, cv::Point(xB,yB), 8, scalarB, -1);
         }
     }
 }

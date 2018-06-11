@@ -15,11 +15,6 @@ int maxQueueLen;
 
 Client::Client(const string& ip, const int p) {
 	// TODO Auto-generated constructor stub
-	clientsd=socket(AF_INET, SOCK_STREAM, 0);
-	if(clientsd==-1){
-		cout<<"Socket error"<<endl;
-		return;
-	}
 	ipAddr=ip;
 	port=p;
 	server_socket.sin_family=AF_INET;
@@ -35,6 +30,10 @@ Client::~Client() {
 }
 
 bool Client::connectServer(){
+    clientsd=socket(AF_INET, SOCK_STREAM, 0);
+    if(clientsd==-1){
+        cout<<"Socket error"<<endl;
+    }
 	std::cout<<"connect"<<std::endl;
 	if(connect(clientsd, (struct sockaddr*)(&server_socket), sizeof(server_socket))<0){
 		printf("Connect error\n");
@@ -77,7 +76,7 @@ void Client::sendSingleImageBuff(uchar* buffer, int size){
 	}
 }
 
-void Client::listenAndSendFrame(loader_callback* func, char* flag){
+void Client::listenAndSendFrame(char* flag){
 	char message[50];
 	strcpy(message, "");
     char* localFlag=flag;
@@ -96,7 +95,7 @@ void Client::listenAndSendFrame(loader_callback* func, char* flag){
             }
             else{
                 //dataMutex.lock();
-                image=(*func)();
+                image=loader_func();
                 if(image.empty()){
                     sendMessage("stop");
                 }
