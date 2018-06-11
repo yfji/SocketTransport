@@ -37,7 +37,8 @@ SOURCES += \
     client.cpp \
     client_read_data.cpp \
     estimator.cpp \
-    guithread.cpp
+    guithread.cpp \
+    calculator.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -46,7 +47,8 @@ HEADERS += \
     client.h \
     config.h \
     estimator.h \
-    guithread.h
+    guithread.h \
+    calculator.h
 
 FORMS += \
         mainwindow.ui

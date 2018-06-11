@@ -6,6 +6,7 @@
 #include <iostream>
 #include <thread>
 #include "socketmanager.h"
+#include "calculator.h"
 #include "guithread.h"
 
 using namespace cv;
@@ -46,7 +47,7 @@ private:
     char ref_selected={0};
     char user_selected={0};
 
-    const int num_parts={14};   // no nose
+    const int num_parts={14};   // no eyes, ears
 
     std::vector<std::string> videoNames={"ref_video.mp4","test_video.mp4"};
 
@@ -58,16 +59,22 @@ private:
     cv::Size user_size;
     cv::Size ref_size;
 
+    DataCal message;
+
     char buff[4096];
     std::vector<DataRow> standardPoseData;
 
     conn_state state;
     char flag = {1};
 
+    int curFrame = {0};
+    const int calc_interval = {10};     //calculate every 10 frames
+
     SocketManager sManager;
 
     draw_callback draw_func;
     std::shared_ptr<GUIThread> thread_ptr;
+    std::shared_ptr<Calculator> calc_ptr;
 
     std::thread client_thread;
     std::thread read_thread;

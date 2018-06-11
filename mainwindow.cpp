@@ -8,6 +8,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    QFont font("Microsoft YaHei", 20, 50);
+    ui->txt_speed->setFont(font);
+    ui->txt_round->setFont(font);
+    ui->txt_calory->setFont(font);
+
     auto qSizeUser=ui->label_user->size();
     auto qSizeRef=ui->label_ref->size();
 
@@ -18,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     thread_ptr.reset(new GUIThread(this, videoNames));
     thread_ptr->setSizes({user_size, ref_size});
+    calc_ptr.reset(new Calculator({2,3,4,5,6,7}));
 
     draw_func=std::bind(&MainWindow::drawUserImage,this,std::placeholders::_1,std::placeholders::_2);
     callback func=std::bind(&MainWindow::my_update_ui,this,std::placeholders::_1,std::placeholders::_2);
@@ -89,6 +96,7 @@ void MainWindow::drawUserImage(cv::Mat& image, std::vector<DataRow>& poseData){
     //do if standard pose provided
     readStandardPoseFile();
     //alignStandardUser(poseData);
+    //calculate(poseData);
     sManager.drawConnections(image, poseData, num_parts);
     /****change the reference or the content of frame_user will trigger the update event!!!why?***/
     //frame_user=image;
@@ -111,6 +119,12 @@ void MainWindow::drawUserImage(cv::Mat& image, std::vector<DataRow>& poseData){
         cv::cvtColor(image, image, cv::COLOR_BGR2RGB);
         frame_user=image;
     }
+    if(curFrame==calc_interval){
+        calc_ptr->setData(poseData);
+        message=calc_ptr->calculate();
+        curFrame=0;
+    }
+    ++curFrame;
     this->update();
 
 }
@@ -138,6 +152,7 @@ void MainWindow::playNetworkPose(){
     assert(cap_ref.isOpened() && cap_user.isOpened());
 
     sManager.cap_ptr=&cap_user;
+    calc_ptr->reset();
 
     client_thread=std::thread(&SocketManager::runSendingThread, &sManager, &flag);
     read_thread=std::thread(&SocketManager::runReceivingThread, &sManager, &draw_func);
@@ -178,6 +193,9 @@ void MainWindow::paintEvent(QPaintEvent *e)
 
     ui->label_user->setPixmap(QPixmap::fromImage(q_frame_user));
     ui->label_ref->setPixmap(QPixmap::fromImage(q_frame_ref));
+    ui->txt_speed->setText(QString::number(std::get<0>(message)));
+    ui->txt_round->setText(QString::number(std::get<1>(message)));
+    ui->txt_calory->setText(QString::number(std::get<2>(message)));
     ui->label_user->show();
     ui->label_ref->show();
 }
