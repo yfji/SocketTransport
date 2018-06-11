@@ -12,6 +12,7 @@ SocketManager::SocketManager()
 
     globalFrames.resize(maxQueueLen);
     randomColors();
+
     bundle=Bundle(&globalFrames,&dataMutex,&maxQueueLen,&recvFrameId);
 }
 
@@ -47,7 +48,9 @@ cv::Mat SocketManager::getImage(){
     dataMutex.lock();
     cap_ptr->read(frame);
 #if	RESIZE==1
-    cv::resize(frame, frame, cv::Size(frame.cols/2, frame.rows/2));
+    if(!frame.empty()){
+        cv::resize(frame, frame, cv::Size(frame.cols/2, frame.rows/2));
+    }
 #endif
     frame.copyTo(globalFrames[sendFrameId]);
     sendFrameId=(sendFrameId+1)%maxQueueLen;
@@ -62,10 +65,10 @@ void SocketManager::runSendingThread(char* flag){
     client_ptr->listenAndSendFrame(flag);
 }
 
-void SocketManager::runReceivingThread(draw_callback* func, char* flag){
+void SocketManager::runReceivingThread(draw_callback* func){
     recvFrameId=0;
     reader_ptr->setCallback(*func);
-    reader_ptr->receiveData(&bundle, flag);
+    reader_ptr->receiveData(&bundle);
 }
 
 void SocketManager::drawConnections(cv::Mat& image, std::vector<DataRow>& pose_data, int np, std::string color){

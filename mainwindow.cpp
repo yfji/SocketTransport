@@ -94,6 +94,11 @@ void MainWindow::drawUserImage(cv::Mat& image, std::vector<DataRow>& poseData){
     //frame_user=image;
     cv::Mat tmp;
     cap_ref.read(tmp);
+#if RESIZE==1
+    if(!tmp.empty()){
+        cv::resize(tmp, tmp, cv::Size(), 0.5, 0.5, cv::INTER_LINEAR);
+    }
+#endif
 
     if(!tmp.empty()){
         sManager.drawConnections(tmp, poseData, num_parts, "green");
@@ -135,7 +140,7 @@ void MainWindow::playNetworkPose(){
     sManager.cap_ptr=&cap_user;
 
     client_thread=std::thread(&SocketManager::runSendingThread, &sManager, &flag);
-    read_thread=std::thread(&SocketManager::runReceivingThread, &sManager, &draw_func, &flag);
+    read_thread=std::thread(&SocketManager::runReceivingThread, &sManager, &draw_func);
 
     client_thread.detach(); //detach is very necessary!!!!!
     read_thread.detach();

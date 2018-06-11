@@ -78,7 +78,7 @@ void ClientReadData::drawKeypoints(cv::Mat& frame){
 
 
 //use func to draw image and keypoints on the UI
-void ClientReadData::receiveData(Bundle* bundle, char* flag){
+void ClientReadData::receiveData(Bundle* bundle){
     int frameCount=0;
 	double fps=0;
 
@@ -87,17 +87,18 @@ void ClientReadData::receiveData(Bundle* bundle, char* flag){
     int& maxQueueLen=*(std::get<2>(*bundle));
     int& recvFrameId=*(std::get<3>(*bundle));
 
-    char * localFlag=flag;
+    invalid_frame=0;
     auto start=std::chrono::high_resolution_clock::now();
 	while(1){
 		memset(buff, '\0', sizeof(buff));
 		int rn=recv(clientsd, buff, sizeof(buff), 0);
 		buff[rn]='\0';
-        if(*localFlag==0){
-            break;
-        }
 		if(rn==0){
 			std::cout<<"No valid data"<<std::endl;
+            if(invalid_frame>=10){
+                break;
+            }
+            ++invalid_frame;
 			usleep(50);
 			continue;
 		}

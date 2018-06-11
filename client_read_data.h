@@ -38,7 +38,8 @@ private:
 	const int queue=10;
 	struct sockaddr_in server_socket;
     char buff[8000];
-	int frameIndex;
+    int frameIndex;
+    int invalid_frame = {0};
 	bool bConnected;
 	cv::Mat canvas;
 	
@@ -59,7 +60,7 @@ public:
     inline void setCallback(draw_callback& callback){
         draw_func=callback;
     }
-    void receiveData(Bundle* bundle, char* flag);
+    void receiveData(Bundle* bundle);
 	void drawKeypoints(cv::Mat& frame);
 	inline void finishReceive(){}
 };
