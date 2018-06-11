@@ -48,6 +48,8 @@ cv::Mat SocketManager::getImage(){
     if(frame.empty()){
         cap_ptr->set(CV_CAP_PROP_POS_FRAMES, 0);
         cap_ptr->read(frame);
+        std::vector<cv::Mat>().swap(globalFrames);
+        globalFrames.resize(maxQueueLen);
         sendFrameId=0;
         recvFrameId=0;
     }
