@@ -49,6 +49,11 @@ public:
     inline void setCallback(loader_callback& callback){
         loader_func=callback;
     }
+    inline void disconnect(){
+        if(bConnected){
+            close(clientsd);
+        }
+    }
 	bool connectServer();
 	void sendMessage(const char* message);
 	void sendSingleImage(char* image);

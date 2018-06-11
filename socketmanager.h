@@ -51,9 +51,10 @@ public:
     cv::VideoCapture * cap_ptr = {nullptr};
 
     bool connect();
-    void disconnect();
-
-    std::vector<DataRow> getPoseData(const char* pose_ptr);
+    inline void disconnect(){
+        client_ptr->disconnect();
+        reader_ptr->disconnect();
+    }
 
     cv::Mat getImage();
 

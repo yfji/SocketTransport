@@ -23,4 +23,6 @@
 #define DATA_PORT   9012
 
 #define RESIZE	1
+#define CAMERA  0
+#define LOOP    1
 #define MAX_LEN	32768

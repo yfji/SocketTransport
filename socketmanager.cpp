@@ -34,14 +34,6 @@ bool SocketManager::connect(){
     return ok;
 }
 
-void SocketManager::disconnect(){
-
-}
-
-std::vector<DataRow> SocketManager::getPoseData(const char* pose_ptr){
-
-}
-
 cv::Mat SocketManager::getImage(){
     assert(cap_ptr!=nullptr);
     cv::Mat frame;
@@ -50,6 +42,14 @@ cv::Mat SocketManager::getImage(){
 #if	RESIZE==1
     if(!frame.empty()){
         cv::resize(frame, frame, cv::Size(frame.cols/2, frame.rows/2));
+    }
+#endif
+#if CAMERA==0 && LOOP==1
+    if(frame.empty()){
+        cap_ptr->set(CV_CAP_PROP_POS_FRAMES, 0);
+        cap_ptr->read(frame);
+        sendFrameId=0;
+        recvFrameId=0;
     }
 #endif
     frame.copyTo(globalFrames[sendFrameId]);

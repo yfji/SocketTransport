@@ -50,6 +50,11 @@ private:
 public:
 	void setIpAndPort(const string& ip, const int p);	
 		
+    inline void disconnect(){
+        if(bConnected){
+            close(clientsd);
+        }
+    }
 	bool connectServer();
 	inline bool isConnected(){
 		return bConnected;

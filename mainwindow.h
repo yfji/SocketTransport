@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <opencv2/opencv.hpp>
 #include <iostream>
+#include <sstream>
+#include <fstream>
 #include <thread>
 #include "socketmanager.h"
 #include "calculator.h"
@@ -62,12 +64,13 @@ private:
     DataCal message;
 
     char buff[4096];
-    std::vector<DataRow> standardPoseData;
+    std::vector<std::vector<DataRow>> standardPoseData;
 
     conn_state state;
     char flag = {1};
 
     int curFrame = {0};
+    int trueFrame = {0};
     const int calc_interval = {10};     //calculate every 10 frames
 
     SocketManager sManager;
@@ -88,7 +91,7 @@ private:
     void playNetworkPose();
 
     void readStandardPoseFile();
-    void alignStandardUser(std::vector<DataRow>& poseData);
+    void alignStandardUser(std::vector<DataRow>& ref, std::vector<DataRow>& poseData);
 
     void connectServer();
 

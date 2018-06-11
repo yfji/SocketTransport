@@ -30,6 +30,8 @@ MainWindow::MainWindow(QWidget *parent) :
     callback func=std::bind(&MainWindow::my_update_ui,this,std::placeholders::_1,std::placeholders::_2);
     thread_ptr->setCallback(func);  //reference of func
     connectSlots();
+
+    readStandardPoseFile();
 }
 
 MainWindow::~MainWindow()
@@ -94,10 +96,8 @@ void MainWindow::playVideo(){
 
 void MainWindow::drawUserImage(cv::Mat& image, std::vector<DataRow>& poseData){
     //do if standard pose provided
-    readStandardPoseFile();
     //alignStandardUser(poseData);
     //calculate(poseData);
-    sManager.drawConnections(image, poseData, num_parts);
     /****change the reference or the content of frame_user will trigger the update event!!!why?***/
     //frame_user=image;
     cv::Mat tmp;
@@ -107,9 +107,21 @@ void MainWindow::drawUserImage(cv::Mat& image, std::vector<DataRow>& poseData){
         cv::resize(tmp, tmp, cv::Size(), 0.5, 0.5, cv::INTER_LINEAR);
     }
 #endif
-
+#if LOOP==1
+    if(tmp.empty()){
+        cap_ref.set(CV_CAP_PROP_POS_FRAMES, 0);
+        cap_ref.read(tmp);
+        trueFrame=0;
+        curFrame=0;
+    }
+#endif
+    std::vector<DataRow> row=standardPoseData[trueFrame];
+    alignStandardUser(row, poseData);
+    sManager.drawConnections(image, row, num_parts, "green");
+    sManager.drawConnections(image, poseData, num_parts);
     if(!tmp.empty()){
-        sManager.drawConnections(tmp, poseData, num_parts, "green");
+        std::vector<DataRow>& data=standardPoseData[trueFrame];
+        sManager.drawConnections(tmp, data, num_parts, "green");
         cv::resize(tmp, tmp, ref_size, cv::INTER_LINEAR);
         cv::cvtColor(tmp, tmp, cv::COLOR_BGR2RGB);
         frame_ref=tmp;
@@ -125,8 +137,8 @@ void MainWindow::drawUserImage(cv::Mat& image, std::vector<DataRow>& poseData){
         curFrame=0;
     }
     ++curFrame;
+    ++trueFrame;
     this->update();
-
 }
 
 void MainWindow::my_update_ui(cv::Mat& userImg, cv::Mat& refImg){
@@ -138,13 +150,18 @@ void MainWindow::my_update_ui(cv::Mat& userImg, cv::Mat& refImg){
 void MainWindow::playNetworkPose(){
     if(!sManager.connect()){
         std::cout<<"No connection, exit"<<std::endl;
+        sManager.disconnect();
         return;
     }
     state=CONNECTED;
     flag=1;
 
     cap_ref.open(videoNames[0]);
+#if CAMERA==0
     cap_user.open(videoNames[1]);
+#elif
+    cap_user.open(0);
+#endif
 
     //int fps_ref=cap_ref.get(CV_CAP_PROP_FPS);
     //int interval=(int)(1.0*1000/fps);
@@ -152,6 +169,8 @@ void MainWindow::playNetworkPose(){
     assert(cap_ref.isOpened() && cap_user.isOpened());
 
     sManager.cap_ptr=&cap_user;
+    curFrame=0;
+    trueFrame=0;
     calc_ptr->reset();
 
     client_thread=std::thread(&SocketManager::runSendingThread, &sManager, &flag);
@@ -162,26 +181,49 @@ void MainWindow::playNetworkPose(){
 }
 
 void MainWindow::readStandardPoseFile(){
-    //stardPoseData=...
+    std::ifstream in;
+    float x,y;
+    for(int i=0;i<100;++i){
+        std::stringstream ss;
+        std::string line;
+        ss<<"refPose/"<<i<<".txt";
+        in.open(ss.str().c_str(), std::ios::in);
+        std::vector<DataRow> frame_data;
+        while(!in.eof()){
+            std::getline(in, line);
+            if(line.length()<=1)
+                continue;
+            ss.str("");
+            ss<<line;
+            ss>>x>>y;
+            DataRow row(x,y,0.0);
+            frame_data.push_back(row);
+        }
+        standardPoseData.push_back(frame_data);
+        in.close();
+    }
 }
 
-void MainWindow::alignStandardUser(std::vector<DataRow>& poseData){  //align your nose with the standard nose
-    int anchorIndex=0;  //nose
-    DataRow& nose_info=standardPoseData[anchorIndex];
-    int anchor_x_ref=std::get<0>(nose_info);
-    int anchor_y_ref=std::get<1>(nose_info);
+void MainWindow::alignStandardUser(std::vector<DataRow>& ref, std::vector<DataRow>& poseData){  //align your nose with the standard nose
+    int anchorIndex1=8;  //left hip
+    int anchorIndex2=11;    //right hip
 
-    int anchor_x_user=std::get<0>(poseData[anchorIndex]);
-    int anchor_y_user=std::get<1>(poseData[anchorIndex]);
+    int anchor_x_ref=(std::get<0>(ref[anchorIndex1])+std::get<0>(ref[anchorIndex2]))/2;
+    int anchor_y_ref=(std::get<0>(ref[anchorIndex1])+std::get<0>(ref[anchorIndex2]))/2;
 
-    int diff_x=anchor_x_user-anchor_x_ref;
-    int diff_y=anchor_y_user-anchor_y_ref;
+    //int anchor_x_user=std::get<0>(poseData[anchorIndex]);
+    //int anchor_y_user=std::get<1>(poseData[anchorIndex]);
+    int anchor_x_user=(std::get<0>(poseData[anchorIndex1])+std::get<0>(poseData[anchorIndex2]))/2;
+    int anchor_y_user=(std::get<1>(poseData[anchorIndex1])+std::get<1>(poseData[anchorIndex2]))/2;
+
+    int diff_x=anchor_x_ref-anchor_x_user;
+    int diff_y=anchor_y_ref-anchor_y_user;
 
     for(int i=0;i<num_parts;++i){
-        int x=std::get<0>(poseData[i]);
-        int y=std::get<0>(poseData[i]);
+        int x=std::get<0>(ref[i]);
+        int y=std::get<1>(ref[i]);
         float prob=std::get<2>(poseData[i]);
-        poseData[i]=DataRow(x-diff_x,y-diff_y,prob);
+        ref[i]=DataRow(x-diff_x,y-diff_y,prob);
     }
 }
 

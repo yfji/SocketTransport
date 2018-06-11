@@ -36,7 +36,7 @@ private:
     float deltax= {0};
     int curRound = {0};
     float curCalory = {0};
-    float calory_coeff={12.1};
+    float calory_coeff={1.21};
 
     char direction= {-1};   //1 or 0. dy>0(up) is positive
     char moving= {0};
