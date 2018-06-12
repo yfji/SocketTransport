@@ -37,23 +37,31 @@ bool SocketManager::connect(){
 cv::Mat SocketManager::getImage(){
     assert(cap_ptr!=nullptr);
     cv::Mat frame;
-    dataMutex.lock();
     cap_ptr->read(frame);
 #if	RESIZE==1
     if(!frame.empty()){
         cv::resize(frame, frame, cv::Size(frame.cols/2, frame.rows/2));
     }
 #endif
-#if CAMERA==0 && LOOP==1
-    if(frame.empty()){
+#if CAMERA==0
+    if(frame.empty() || *loop){
         cap_ptr->set(CV_CAP_PROP_POS_FRAMES, 0);
         cap_ptr->read(frame);
-        std::vector<cv::Mat>().swap(globalFrames);
-        globalFrames.resize(maxQueueLen);
-        sendFrameId=0;
-        recvFrameId=0;
+        *loop=1-*loop;
     }
 #endif
+#if LOOP==1
+    if(frame.empty() || *loop){
+        dataMutex.lock();
+        std::vector<cv::Mat>().swap(globalFrames);
+        globalFrames.resize(maxQueueLen);
+        dataMutex.unlock();
+        sendFrameId=0;
+        recvFrameId=0;
+        *loop=1-*loop;
+    }
+#endif
+    dataMutex.lock();
     frame.copyTo(globalFrames[sendFrameId]);
     sendFrameId=(sendFrameId+1)%maxQueueLen;
     dataMutex.unlock();
@@ -79,20 +87,21 @@ void SocketManager::drawConnections(cv::Mat& image, std::vector<DataRow>& pose_d
     char rand=(color=="rand"?1:0);
 
     assert(np<=pose_data.size());
-    for(auto i=0;i<np;i+=2){
-        int start=limbSeq[i];
-        int end=limbSeq[i+1];
+    for(auto i=0;i<np-1;++i){
+        int ind=2*i;
+        int start=limbSeq[ind];
+        int end=limbSeq[ind+1];
         int xA=std::get<0>(pose_data[start]);
         int yA=std::get<1>(pose_data[start]);
         int xB=std::get<0>(pose_data[end]);
         int yB=std::get<1>(pose_data[end]);
 
         if(xA>0 && yA>0 && xB>0 && yB>0){
-            scalarA=(rand==0?colors[color]:pallete[i]);
-            scalarB=(rand==0?colors[color]:pallete[i+1]);
-            cv::line(image, cv::Point(xA,yA), cv::Point(xB,yB), scalarA, 4);
-            cv::circle(image, cv::Point(xA,yA), 8, scalarA, -1);
-            cv::circle(image, cv::Point(xB,yB), 8, scalarB, -1);
+            scalarA=(rand==0?colors[color]:pallete[ind]);
+            scalarB=(rand==0?colors[color]:pallete[ind+1]);
+            cv::line(image, cv::Point(xA,yA), cv::Point(xB,yB), scalarA, 2);
+            cv::circle(image, cv::Point(xA,yA), 5, scalarA, -1);
+            cv::circle(image, cv::Point(xB,yB), 5, scalarB, -1);
         }
     }
 }

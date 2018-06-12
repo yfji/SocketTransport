@@ -111,11 +111,12 @@ void ClientReadData::receiveData(Bundle* bundle){
 			// DO SOMETHING
 		}
 		else{
+            dataMutex.lock();
             if(globalFrames[recvFrameId].empty()){
 				sendMessage("data");
+                dataMutex.unlock();
 				continue;
 			}
-            dataMutex.lock();
             globalFrames[recvFrameId].copyTo(canvas);
             dataMutex.unlock();
 

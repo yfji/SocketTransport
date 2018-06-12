@@ -49,6 +49,7 @@ private:
 public:
     std::string filename;
     cv::VideoCapture * cap_ptr = {nullptr};
+    char* loop;
 
     bool connect();
     inline void disconnect(){

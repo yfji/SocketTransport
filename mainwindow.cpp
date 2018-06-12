@@ -108,11 +108,12 @@ void MainWindow::drawUserImage(cv::Mat& image, std::vector<DataRow>& poseData){
     }
 #endif
 #if LOOP==1
-    if(tmp.empty()){
+    if(tmp.empty() || new_loop){
         cap_ref.set(CV_CAP_PROP_POS_FRAMES, 0);
         cap_ref.read(tmp);
         trueFrame=0;
         curFrame=0;
+        new_loop=1-new_loop;
     }
 #endif
     std::vector<DataRow> row=standardPoseData[trueFrame];
@@ -159,8 +160,10 @@ void MainWindow::playNetworkPose(){
     cap_ref.open(videoNames[0]);
 #if CAMERA==0
     cap_user.open(videoNames[1]);
-#elif
+#else
     cap_user.open(0);
+    cap_user.set(CV_CAP_PROP_FRAME_WIDTH, frame_width);
+    cap_user.set(CV_CAP_PROP_FRAME_HEIGHT, frame_height);
 #endif
 
     //int fps_ref=cap_ref.get(CV_CAP_PROP_FPS);
@@ -169,6 +172,7 @@ void MainWindow::playNetworkPose(){
     assert(cap_ref.isOpened() && cap_user.isOpened());
 
     sManager.cap_ptr=&cap_user;
+    sManager.loop=&new_loop;
     curFrame=0;
     trueFrame=0;
     calc_ptr->reset();
@@ -180,10 +184,10 @@ void MainWindow::playNetworkPose(){
     read_thread.detach();
 }
 
-void MainWindow::readStandardPoseFile(){
+void MainWindow::readStandardPoseFile(const int frameCount){
     std::ifstream in;
     float x,y;
-    for(int i=0;i<100;++i){
+    for(int i=0;i<frameCount;++i){
         std::stringstream ss;
         std::string line;
         ss<<"refPose/"<<i<<".txt";
@@ -209,7 +213,7 @@ void MainWindow::alignStandardUser(std::vector<DataRow>& ref, std::vector<DataRo
     int anchorIndex2=11;    //right hip
 
     int anchor_x_ref=(std::get<0>(ref[anchorIndex1])+std::get<0>(ref[anchorIndex2]))/2;
-    int anchor_y_ref=(std::get<0>(ref[anchorIndex1])+std::get<0>(ref[anchorIndex2]))/2;
+    int anchor_y_ref=(std::get<1>(ref[anchorIndex1])+std::get<1>(ref[anchorIndex2]))/2;
 
     //int anchor_x_user=std::get<0>(poseData[anchorIndex]);
     //int anchor_y_user=std::get<1>(poseData[anchorIndex]);
@@ -223,7 +227,9 @@ void MainWindow::alignStandardUser(std::vector<DataRow>& ref, std::vector<DataRo
         int x=std::get<0>(ref[i]);
         int y=std::get<1>(ref[i]);
         float prob=std::get<2>(poseData[i]);
-        ref[i]=DataRow(x-diff_x,y-diff_y,prob);
+        if(x>0 && y>0){
+            ref[i]=DataRow(x-diff_x,y-diff_y,prob);
+        }
     }
 }
 

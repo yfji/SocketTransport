@@ -8,10 +8,12 @@
 #include <mutex>
 #include <memory>
 
+/*
 cv::Mat	globalFrame;
 vector<cv::Mat> globalFrames;
 std::mutex dataMutex;
 int maxQueueLen;
+*/
 
 Client::Client(const string& ip, const int p) {
 	// TODO Auto-generated constructor stub

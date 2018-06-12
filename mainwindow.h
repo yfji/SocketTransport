@@ -49,6 +49,9 @@ private:
     char ref_selected={0};
     char user_selected={0};
 
+    const int frame_width = {1280};
+    const int frame_height = {720};
+
     const int num_parts={14};   // no eyes, ears
 
     std::vector<std::string> videoNames={"ref_video.mp4","test_video.mp4"};
@@ -68,6 +71,7 @@ private:
 
     conn_state state;
     char flag = {1};
+    char new_loop = {0};
 
     int curFrame = {0};
     int trueFrame = {0};
@@ -90,7 +94,7 @@ private:
 
     void playNetworkPose();
 
-    void readStandardPoseFile();
+    void readStandardPoseFile(const int frameCount=100);
     void alignStandardUser(std::vector<DataRow>& ref, std::vector<DataRow>& poseData);
 
     void connectServer();
