@@ -59,11 +59,13 @@ public:
 
     cv::Mat getImage();
 
+    void resetNewLoop();
+
     void runSendingThread(char* flag);
 
     void runReceivingThread(draw_callback* func);
 
-    void drawConnections(cv::Mat& image, std::vector<DataRow>& pose_data, int np=18, std::string color="rand");
+    void drawConnections(cv::Mat& image, std::vector<DataRow>& pose_data, int num_limb=17, std::string color="rand");
 };
 
 /****

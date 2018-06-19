@@ -102,35 +102,40 @@ void MainWindow::drawUserImage(cv::Mat& image, std::vector<DataRow>& poseData){
     //frame_user=image;
     cv::Mat tmp;
     cap_ref.read(tmp);
+    cv::Mat canvas=image.clone();
 #if RESIZE==1
     if(!tmp.empty()){
         cv::resize(tmp, tmp, cv::Size(), 0.5, 0.5, cv::INTER_LINEAR);
     }
 #endif
 #if LOOP==1
-    if(tmp.empty() || new_loop){
-        cap_ref.set(CV_CAP_PROP_POS_FRAMES, 0);
-        cap_ref.read(tmp);
-        trueFrame=0;
-        curFrame=0;
-        new_loop=1-new_loop;
+    if(tmp.empty()){
+        reset();
+        return;
     }
 #endif
-    std::vector<DataRow> row=standardPoseData[trueFrame];
-    alignStandardUser(row, poseData);
-    sManager.drawConnections(image, row, num_parts, "green");
-    sManager.drawConnections(image, poseData, num_parts);
+    if(poseData.size()==0){
+        cv::resize(canvas, canvas, user_size, cv::INTER_LINEAR);
+        cv::cvtColor(canvas, canvas, cv::COLOR_BGR2RGB);
+        frame_user=canvas;
+        this->update();
+        return;
+    }
     if(!tmp.empty()){
         std::vector<DataRow>& data=standardPoseData[trueFrame];
-        sManager.drawConnections(tmp, data, num_parts, "green");
+        sManager.drawConnections(tmp, data, num_parts-1, "green");
         cv::resize(tmp, tmp, ref_size, cv::INTER_LINEAR);
         cv::cvtColor(tmp, tmp, cv::COLOR_BGR2RGB);
         frame_ref=tmp;
     }
-    if(!image.empty()){
-        cv::resize(image, image, user_size, cv::INTER_LINEAR);
-        cv::cvtColor(image, image, cv::COLOR_BGR2RGB);
-        frame_user=image;
+    if(!canvas.empty()){
+        std::vector<DataRow> row=standardPoseData[trueFrame];
+        alignStandardUser(row, poseData);
+        sManager.drawConnections(canvas, row, num_parts-1, "green");
+        sManager.drawConnections(canvas, poseData, num_parts-1);
+        cv::resize(canvas, canvas, user_size, cv::INTER_LINEAR);
+        cv::cvtColor(canvas, canvas, cv::COLOR_BGR2RGB);
+        frame_user=canvas;
     }
     if(curFrame==calc_interval){
         calc_ptr->setData(poseData);
@@ -252,6 +257,7 @@ void MainWindow::btn_stop_clicked()
 {
     state=DISCONNECTED;
     flag=0;
+    //reset();
 }
 
 void MainWindow::btn_play_clicked()

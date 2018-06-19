@@ -48,6 +48,7 @@ private:
 	void reset(const string& ip, const int p);
 	
 public:
+    char roundFinish= {0};
 	void setIpAndPort(const string& ip, const int p);	
 		
     inline void disconnect(){

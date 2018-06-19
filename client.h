@@ -40,7 +40,7 @@ private:
 	struct sockaddr_in client_socket;
 	unsigned char buff[MAX_LEN];
 
-	int numEmptyFrames;
+    int numEmptyFrames ={0};
 	bool bConnected;
 	int frames;
 

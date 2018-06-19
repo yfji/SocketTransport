@@ -82,12 +82,14 @@ void ClientReadData::receiveData(Bundle* bundle){
     int frameCount=0;
 	double fps=0;
 
-    std::vector<cv::Mat>& globalFrames=*(std::get<0>(*bundle));
-    std::mutex& dataMutex=*(std::get<1>(*bundle));
-    int& maxQueueLen=*(std::get<2>(*bundle));
-    int& recvFrameId=*(std::get<3>(*bundle));
+    std::vector<cv::Mat>* globalFrames=std::get<0>(*bundle);
+    std::mutex* dataMutex=std::get<1>(*bundle);
+    int* maxQueueLen=std::get<2>(*bundle);
+    int* recvFrameId=std::get<3>(*bundle);
 
     invalid_frame=0;
+    std::vector<DataRow> peaks;
+
     auto start=std::chrono::high_resolution_clock::now();
 	while(1){
 		memset(buff, '\0', sizeof(buff));
@@ -107,21 +109,26 @@ void ClientReadData::receiveData(Bundle* bundle){
 			break;
 		}
 		else if(strcmp(buff, "nop")==0){
-			std::cout<<"nop"<<std::endl;
+            //std::cout<<"nop"<<std::endl;
+            if(roundFinish){
+                draw_func(canvas, peaks);
+            }
 			// DO SOMETHING
 		}
 		else{
-            dataMutex.lock();
-            if(globalFrames[recvFrameId].empty()){
+            //dataMutex->lock();
+            if((*globalFrames)[*recvFrameId].empty()){
 				sendMessage("data");
-                dataMutex.unlock();
+                //dataMutex->unlock();
 				continue;
 			}
-            globalFrames[recvFrameId].copyTo(canvas);
-            dataMutex.unlock();
+            //globalFrames[recvFrameId].copyTo(canvas);
+            dataMutex->lock();
+            canvas=(*globalFrames)[*recvFrameId];
+            dataMutex->unlock();
 
             estimator_ptr->readOpenposePeaks(buff);
-            std::vector<DataRow> peaks=estimator_ptr->getOpenposePeaks();
+            peaks=estimator_ptr->getOpenposePeaks();
             //do something...
             //drawKeypoints(canvas);
 			// cv::imshow("frame", canvas); cv::waitKey(1);
@@ -131,8 +138,8 @@ void ClientReadData::receiveData(Bundle* bundle){
 			double seconds=duration_ns/1e9;
 			fps=(++frameCount)/seconds;
             //std::cout<<"fps: "<<fps<<endl;
+            *recvFrameId=(*recvFrameId+1)%(*maxQueueLen);
 		}
-        recvFrameId=(recvFrameId+1)%maxQueueLen;
 		sendMessage("data");
 		usleep(5);
 	}

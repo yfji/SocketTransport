@@ -38,16 +38,23 @@ cv::Mat SocketManager::getImage(){
     assert(cap_ptr!=nullptr);
     cv::Mat frame;
     cap_ptr->read(frame);
-#if	RESIZE==1
-    if(!frame.empty()){
-        cv::resize(frame, frame, cv::Size(frame.cols/2, frame.rows/2));
+#if LOOP==1
+    if(frame.empty()){
+        std::cout<<"Black image"<<std::endl;
+        reader_ptr->roundFinish=1;  //prepared for black images
+        return cv::Mat::zeros(480, 640, CV_8UC3);
     }
 #endif
+#if	RESIZE==1
+    if(!frame.empty()){
+        cv::resize(frame, frame, cv::Size(), 0.5,0.5, cv::INTER_LINEAR);
+    }
+#endif
+/*
 #if CAMERA==0
-    if(frame.empty() || *loop){
+    if(frame.empty()){
         cap_ptr->set(CV_CAP_PROP_POS_FRAMES, 0);
         cap_ptr->read(frame);
-        *loop=1-*loop;
     }
 #endif
 #if LOOP==1
@@ -61,11 +68,24 @@ cv::Mat SocketManager::getImage(){
         *loop=1-*loop;
     }
 #endif
+*/
     dataMutex.lock();
     frame.copyTo(globalFrames[sendFrameId]);
     sendFrameId=(sendFrameId+1)%maxQueueLen;
     dataMutex.unlock();
     return frame;
+}
+
+void SocketManager::resetNewLoop(){
+    dataMutex.lock();
+    reader_ptr->roundFinish=0;  //new loop, do not drawUserImage until valid image comes
+    std::vector<cv::Mat>().swap(globalFrames);
+    globalFrames.clear();   //clear is very necessary
+    globalFrames.resize(maxQueueLen);
+    sendFrameId=0;
+    recvFrameId=0;
+    //reader_ptr->roundFinish=0;
+    dataMutex.unlock();
 }
 
 void SocketManager::runSendingThread(char* flag){
@@ -81,13 +101,13 @@ void SocketManager::runReceivingThread(draw_callback* func){
     reader_ptr->receiveData(&bundle);
 }
 
-void SocketManager::drawConnections(cv::Mat& image, std::vector<DataRow>& pose_data, int np, std::string color){
+void SocketManager::drawConnections(cv::Mat& image, std::vector<DataRow>& pose_data, int num_limb, std::string color){
     cv::Scalar scalarA;
     cv::Scalar scalarB;
     char rand=(color=="rand"?1:0);
 
-    assert(np<=pose_data.size());
-    for(auto i=0;i<np-1;++i){
+    assert(num_limb<=pose_data.size());
+    for(auto i=0;i<num_limb;++i){
         int ind=2*i;
         int start=limbSeq[ind];
         int end=limbSeq[ind+1];

@@ -102,6 +102,14 @@ private:
     //callback function
     void drawUserImage(cv::Mat& image, std::vector<DataRow>& poseData);
 
+    inline void reset(){
+        sManager.resetNewLoop();
+        trueFrame=0;
+        curFrame=0;
+        cap_ref.set(CV_CAP_PROP_POS_FRAMES, 0);
+        cap_user.set(CV_CAP_PROP_POS_FRAMES, 0);
+    }
+
 };
 
 #endif // MAINWINDOW_H

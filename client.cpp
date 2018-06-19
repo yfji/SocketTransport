@@ -22,7 +22,7 @@ Client::Client(const string& ip, const int p) {
 	server_socket.sin_family=AF_INET;
 	server_socket.sin_port=htons(port);
 	server_socket.sin_addr.s_addr=inet_addr(ipAddr.c_str());
-	numEmptyFrames=0;
+    numEmptyFrames=0;
 }
 
 Client::~Client() {
